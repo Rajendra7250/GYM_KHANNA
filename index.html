@@ -6,7 +6,10 @@
   <meta name="description" content="GymKhanna — Track your workouts, nutrition, and fitness progress. Built for gym rats who mean business.">
   <title>GymKhanna | Fitness Tracker for Gym Rats</title>
   <link rel="stylesheet" href="css/styles.css">
-  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='0.9em' font-size='90'>🏋️</text></svg>">
+  <link rel="icon" href="icon.svg">
+  <link rel="apple-touch-icon" href="icon.svg">
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#a855f7">
 </head>
 <body>
 
@@ -36,6 +39,10 @@
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
         Progress
       </a>
+      <a class="nav-item" data-page="settings" id="nav-settings">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-2 2 2 2 0 01-2-2v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83 0 2 2 0 010-2.83l.06-.06a1.65 1.65 0 00.33-1.82 1.65 1.65 0 00-1.51-1H3a2 2 0 01-2-2 2 2 0 012-2h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 010-2.83 2 2 0 012.83 0l.06.06a1.65 1.65 0 001.82.33H9a1.65 1.65 0 001-1.51V3a2 2 0 012-2 2 2 0 012 2v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 0 2 2 0 010 2.83l-.06.06a1.65 1.65 0 00-.33 1.82V9a1.65 1.65 0 001.51 1H21a2 2 0 012 2 2 2 0 01-2 2h-.09a1.65 1.65 0 00-1.51 1z"/></svg>
+        Settings
+      </a>
     </nav>
   </aside>
 
@@ -57,6 +64,10 @@
       <button class="bottom-nav-item" data-page="progress">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
         <span>Progress</span>
+      </button>
+      <button class="bottom-nav-item" data-page="settings">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-2 2 2 2 0 01-2-2v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83 0 2 2 0 010-2.83l.06-.06a1.65 1.65 0 00.33-1.82 1.65 1.65 0 00-1.51-1H3a2 2 0 01-2-2 2 2 0 012-2h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 010-2.83 2 2 0 012.83 0l.06.06a1.65 1.65 0 001.82.33H9a1.65 1.65 0 001-1.51V3a2 2 0 012-2 2 2 0 012 2v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 0 2 2 0 010 2.83l-.06.06a1.65 1.65 0 00-.33 1.82V9a1.65 1.65 0 001.51 1H21a2 2 0 012 2 2 2 0 01-2 2h-.09a1.65 1.65 0 00-1.51 1z"/></svg>
+        <span>Settings</span>
       </button>
     </div>
   </nav>
@@ -154,6 +165,54 @@
       <div class="section-title"><h3>Personal Records 🏆</h3></div>
       <div class="pr-grid" id="pr-grid"></div>
     </section>
+
+    <!-- ============ SETTINGS PAGE ============ -->
+    <section class="page" id="page-settings">
+      <div class="page-header">
+        <h2>Settings</h2>
+        <p>Customize your experience</p>
+      </div>
+
+      <div class="card" style="margin-bottom: var(--sp-xl);">
+        <div class="section-title"><h3>Preferences & Goals</h3></div>
+        <form id="form-settings">
+          <div class="form-group">
+            <label class="form-label">Weight Unit</label>
+            <select class="form-select" id="set-unit">
+              <option value="kg">Kilograms (kg)</option>
+              <option value="lbs">Pounds (lbs)</option>
+            </select>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Protein Goal (g)</label>
+              <input type="number" class="form-input" id="set-protein" required>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Carbs Goal (g)</label>
+              <input type="number" class="form-input" id="set-carbs" required>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Fat Goal (g)</label>
+              <input type="number" class="form-input" id="set-fat" required>
+            </div>
+          </div>
+          <button type="submit" class="btn btn-primary" style="margin-top:var(--sp-sm);">Save Settings</button>
+        </form>
+      </div>
+
+      <div class="card">
+        <div class="section-title"><h3>Data Backup</h3></div>
+        <p style="font-size:0.85rem; color:var(--text-secondary); margin-bottom:var(--sp-lg);">Export your workout and nutrition data to a JSON file to keep it safe, or import an existing backup.</p>
+        <div style="display:flex; gap:var(--sp-md);">
+          <button class="btn btn-primary" id="btn-export">Export Data</button>
+          <label class="btn btn-ghost" style="cursor:pointer;">
+            Import Data
+            <input type="file" id="file-import" accept=".json" style="display:none;">
+          </label>
+        </div>
+      </div>
+    </section>
   </main>
 </div>
 
@@ -171,52 +230,6 @@
         <label class="form-label">Exercise</label>
         <select class="form-select" id="workout-exercise" required>
           <option value="">Select or type below...</option>
-          <optgroup label="Chest">
-            <option value="Bench Press">Bench Press</option>
-            <option value="Incline Bench Press">Incline Bench Press</option>
-            <option value="Dumbbell Flyes">Dumbbell Flyes</option>
-            <option value="Push Ups">Push Ups</option>
-            <option value="Cable Crossover">Cable Crossover</option>
-          </optgroup>
-          <optgroup label="Back">
-            <option value="Deadlift">Deadlift</option>
-            <option value="Pull Ups">Pull Ups</option>
-            <option value="Barbell Row">Barbell Row</option>
-            <option value="Lat Pulldown">Lat Pulldown</option>
-            <option value="Seated Cable Row">Seated Cable Row</option>
-          </optgroup>
-          <optgroup label="Legs">
-            <option value="Squat">Squat</option>
-            <option value="Leg Press">Leg Press</option>
-            <option value="Romanian Deadlift">Romanian Deadlift</option>
-            <option value="Lunges">Lunges</option>
-            <option value="Leg Curl">Leg Curl</option>
-            <option value="Calf Raises">Calf Raises</option>
-          </optgroup>
-          <optgroup label="Shoulders">
-            <option value="Overhead Press">Overhead Press</option>
-            <option value="Lateral Raises">Lateral Raises</option>
-            <option value="Face Pulls">Face Pulls</option>
-            <option value="Arnold Press">Arnold Press</option>
-          </optgroup>
-          <optgroup label="Arms">
-            <option value="Barbell Curl">Barbell Curl</option>
-            <option value="Tricep Pushdown">Tricep Pushdown</option>
-            <option value="Hammer Curl">Hammer Curl</option>
-            <option value="Skull Crushers">Skull Crushers</option>
-          </optgroup>
-          <optgroup label="Core">
-            <option value="Plank">Plank</option>
-            <option value="Crunches">Crunches</option>
-            <option value="Hanging Leg Raise">Hanging Leg Raise</option>
-            <option value="Cable Woodchop">Cable Woodchop</option>
-          </optgroup>
-          <optgroup label="Cardio">
-            <option value="Running">Running</option>
-            <option value="Cycling">Cycling</option>
-            <option value="Jump Rope">Jump Rope</option>
-            <option value="Rowing">Rowing</option>
-          </optgroup>
         </select>
       </div>
       <div class="form-group">
@@ -317,6 +330,9 @@
 <div class="toast-container" id="toast-container"></div>
 
 <script src="js/storage.js"></script>
+<script src="js/settings.js"></script>
+<script src="js/timer.js"></script>
+<script src="js/exercises.js"></script>
 <script src="js/charts.js"></script>
 <script src="js/dashboard.js"></script>
 <script src="js/workouts.js"></script>

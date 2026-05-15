@@ -7,6 +7,7 @@ const Progress = (() => {
     const totalVolume = Storage.getTotalVolume();
     const streak = Storage.getStreak();
     const latestWeight = Storage.getLatestWeight();
+    const unit = Settings.getSettings().unit;
 
     const statsEl = document.getElementById('progress-stats');
     if (statsEl) {
@@ -19,11 +20,11 @@ const Progress = (() => {
         <div class="stat-card pink">
           <div class="stat-card-icon">📊</div>
           <div class="stat-card-value">${totalVolume > 0 ? (totalVolume / 1000).toFixed(1) + 'k' : '0'}</div>
-          <div class="stat-card-label">Total Volume (kg)</div>
+          <div class="stat-card-label">Volume (${unit})</div>
         </div>
         <div class="stat-card cyan">
           <div class="stat-card-icon">⚖️</div>
-          <div class="stat-card-value">${latestWeight !== null ? latestWeight + ' kg' : '—'}</div>
+          <div class="stat-card-value">${latestWeight !== null ? latestWeight + ' ' + unit : '—'}</div>
           <div class="stat-card-label">Current Weight</div>
         </div>
         <div class="stat-card fire">
@@ -86,12 +87,13 @@ const Progress = (() => {
     }
 
     let html = '';
+    const unit = Settings.getSettings().unit;
     prs.forEach(pr => {
       html += `
         <div class="pr-card">
           <div class="pr-card-lift">${pr.exercise}</div>
           <div class="pr-card-value">${pr.weight}</div>
-          <div class="pr-card-unit">kg × ${pr.reps} reps</div>
+          <div class="pr-card-unit">${unit} × ${pr.reps} reps</div>
         </div>
       `;
     });

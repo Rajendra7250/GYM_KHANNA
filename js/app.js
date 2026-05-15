@@ -23,6 +23,7 @@ const App = (() => {
       case 'workouts': Workouts.render(); break;
       case 'nutrition': Nutrition.render(); break;
       case 'progress': Progress.render(); break;
+      case 'settings': Settings.render(); break;
     }
   }
 
@@ -89,6 +90,8 @@ const App = (() => {
     if (btnAddFood) btnAddFood.addEventListener('click', () => openModal('modal-food'));
 
     // Init sub-modules
+    Settings.init();
+    Timer.init();
     Workouts.init();
     Nutrition.init();
     Progress.init();
@@ -108,6 +111,11 @@ const App = (() => {
         }
       }, 250);
     });
+
+    // Register Service Worker for PWA
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('sw.js').catch(err => console.log('SW setup failed', err));
+    }
   }
 
   // Start when DOM is ready

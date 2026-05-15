@@ -21,6 +21,7 @@ const Workouts = (() => {
     }
 
     let html = '';
+    const unit = Settings.getSettings().unit;
     groups.forEach(([date, exercises]) => {
       const label = Storage.isToday(date) ? 'Today' : Storage.formatDate(date);
       html += `<div class="date-group"><div class="date-group-header">${label}</div><div class="data-list">`;
@@ -33,10 +34,10 @@ const Workouts = (() => {
               <div class="data-item-name">${ex.exercise}</div>
               <div class="data-item-meta">
                 <span class="muscle-tag ${ex.muscle}">${ex.muscle}</span>
-                &nbsp; ${ex.sets}×${ex.reps} ${ex.weight ? '@ ' + ex.weight + 'kg' : ''}
+                &nbsp; ${ex.sets}×${ex.reps} ${ex.weight ? '@ ' + ex.weight + unit : ''}
               </div>
             </div>
-            ${vol > 0 ? `<div class="data-item-value">${vol.toLocaleString()} kg</div>` : ''}
+            ${vol > 0 ? `<div class="data-item-value">${vol.toLocaleString()} ${unit}</div>` : ''}
             <div class="data-item-actions">
               <button class="btn-icon" onclick="Workouts.remove('${ex.id}')" title="Delete">
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2"/></svg>
@@ -70,6 +71,7 @@ const Workouts = (() => {
     App.toast('Exercise logged! 💪', 'success');
     render();
     Dashboard.render();
+    Timer.start(90); // Start 90s rest timer
   }
 
   function remove(id) {
@@ -95,6 +97,7 @@ const Workouts = (() => {
   }
 
   function init() {
+    ExerciseLibrary.populateSelect('workout-exercise');
     document.getElementById('form-workout').addEventListener('submit', handleSubmit);
     initPresetSync();
   }

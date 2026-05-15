@@ -49,8 +49,9 @@ const Nutrition = (() => {
       `;
     }
 
-    // Macro bars (goals: protein 150g, carbs 250g, fat 65g)
-    const goals = { protein: 150, carbs: 250, fat: 65 };
+    // Macro bars
+    const settings = Settings.getSettings();
+    const goals = { protein: settings.protein, carbs: settings.carbs, fat: settings.fat };
     const macroEl = document.getElementById('macro-bars');
     if (macroEl) {
       macroEl.innerHTML = `
