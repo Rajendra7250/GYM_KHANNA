@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="GymKhanna — Track your workouts, nutrition, and fitness progress. Built for gym rats who mean business.">
+  <title>GymKhanna | Fitness Tracker for Gym Rats</title>
+  <link rel="stylesheet" href="css/styles.css">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='0.9em' font-size='90'>🏋️</text></svg>">
+</head>
+<body>
+
+<div class="bg-ambience"></div>
+
+<div class="app-container">
+  <!-- Sidebar Navigation -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-logo">
+      <div class="logo-icon">🏋️</div>
+      <h1>GymKhanna</h1>
+    </div>
+    <nav class="sidebar-nav">
+      <a class="nav-item active" data-page="dashboard" id="nav-dashboard">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+        Dashboard
+      </a>
+      <a class="nav-item" data-page="workouts" id="nav-workouts">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6.5 6.5h11"/><path d="M6.5 17.5h11"/><path d="M3 12h18"/><path d="M4 6.5V17.5"/><path d="M20 6.5V17.5"/><path d="M6.5 4v4"/><path d="M6.5 16v4"/><path d="M17.5 4v4"/><path d="M17.5 16v4"/></svg>
+        Workouts
+      </a>
+      <a class="nav-item" data-page="nutrition" id="nav-nutrition">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8h1a4 4 0 010 8h-1"/><path d="M2 8h16v9a4 4 0 01-4 4H6a4 4 0 01-4-4V8z"/><line x1="6" y1="1" x2="6" y2="4"/><line x1="10" y1="1" x2="10" y2="4"/><line x1="14" y1="1" x2="14" y2="4"/></svg>
+        Nutrition
+      </a>
+      <a class="nav-item" data-page="progress" id="nav-progress">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+        Progress
+      </a>
+    </nav>
+  </aside>
+
+  <!-- Mobile Bottom Nav -->
+  <nav class="bottom-nav" id="bottom-nav">
+    <div class="bottom-nav-items">
+      <button class="bottom-nav-item active" data-page="dashboard">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+        <span>Home</span>
+      </button>
+      <button class="bottom-nav-item" data-page="workouts">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6.5 6.5h11"/><path d="M6.5 17.5h11"/><path d="M3 12h18"/><path d="M4 6.5V17.5"/><path d="M20 6.5V17.5"/></svg>
+        <span>Workouts</span>
+      </button>
+      <button class="bottom-nav-item" data-page="nutrition">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8h1a4 4 0 010 8h-1"/><path d="M2 8h16v9a4 4 0 01-4 4H6a4 4 0 01-4-4V8z"/></svg>
+        <span>Nutrition</span>
+      </button>
+      <button class="bottom-nav-item" data-page="progress">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+        <span>Progress</span>
+      </button>
+    </div>
+  </nav>
+
+  <!-- Main Content -->
+  <main class="main-content" id="main-content">
+
+    <!-- ============ DASHBOARD PAGE ============ -->
+    <section class="page active" id="page-dashboard">
+      <div class="page-header">
+        <h2>Dashboard</h2>
+        <p id="dashboard-greeting">Let's crush it today! 💪</p>
+      </div>
+      <div class="stat-cards" id="dashboard-stats"></div>
+      <div class="quick-actions">
+        <div class="quick-action" id="qa-workout">
+          <div class="quick-action-icon">🏋️</div>
+          <div class="quick-action-label">Log Workout</div>
+        </div>
+        <div class="quick-action" id="qa-food">
+          <div class="quick-action-icon">🍗</div>
+          <div class="quick-action-label">Log Food</div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="section-title"><h3>Weekly Activity</h3></div>
+        <div class="chart-container"><canvas id="chart-weekly" height="220"></canvas></div>
+      </div>
+    </section>
+
+    <!-- ============ WORKOUTS PAGE ============ -->
+    <section class="page" id="page-workouts">
+      <div class="page-header">
+        <h2>Workouts</h2>
+        <p>Track every set, rep, and PR</p>
+      </div>
+      <div class="section-title">
+        <h3>Exercise Log</h3>
+        <button class="btn btn-primary" id="btn-add-workout">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          Add Exercise
+        </button>
+      </div>
+      <div id="workout-list"></div>
+    </section>
+
+    <!-- ============ NUTRITION PAGE ============ -->
+    <section class="page" id="page-nutrition">
+      <div class="page-header">
+        <h2>Nutrition</h2>
+        <p>Fuel your gains the right way</p>
+      </div>
+      <div class="date-nav">
+        <button class="btn-icon" id="food-prev-day">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15 18 9 12 15 6"/></svg>
+        </button>
+        <span class="date-nav-label" id="food-date-label">Today</span>
+        <button class="btn-icon" id="food-next-day">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg>
+        </button>
+      </div>
+      <div class="stat-cards" id="nutrition-stats"></div>
+      <div class="macro-bar-container">
+        <div class="section-title"><h3>Macros</h3></div>
+        <div class="macro-bars" id="macro-bars"></div>
+      </div>
+      <div class="section-title">
+        <h3>Food Log</h3>
+        <button class="btn btn-primary" id="btn-add-food">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          Add Food
+        </button>
+      </div>
+      <div id="food-list"></div>
+    </section>
+
+    <!-- ============ PROGRESS PAGE ============ -->
+    <section class="page" id="page-progress">
+      <div class="page-header">
+        <h2>Progress</h2>
+        <p>See how far you've come</p>
+      </div>
+      <div class="stat-cards" id="progress-stats"></div>
+      <div class="card" style="margin-bottom: var(--sp-xl);">
+        <div class="section-title"><h3>Body Weight</h3></div>
+        <div class="weight-input-row">
+          <div class="form-group">
+            <label class="form-label">Weight (kg)</label>
+            <input type="number" class="form-input" id="weight-input" placeholder="e.g. 75" step="0.1">
+          </div>
+          <button class="btn btn-primary" id="btn-log-weight">Log</button>
+        </div>
+        <div class="chart-container"><canvas id="chart-weight" height="200"></canvas></div>
+      </div>
+      <div class="section-title"><h3>Personal Records 🏆</h3></div>
+      <div class="pr-grid" id="pr-grid"></div>
+    </section>
+  </main>
+</div>
+
+<!-- ===== MODALS ===== -->
+
+<!-- Add Workout Modal -->
+<div class="modal-overlay" id="modal-workout">
+  <div class="modal">
+    <div class="modal-header">
+      <h3>Log Exercise</h3>
+      <button class="modal-close" data-close="modal-workout">✕</button>
+    </div>
+    <form id="form-workout">
+      <div class="form-group">
+        <label class="form-label">Exercise</label>
+        <select class="form-select" id="workout-exercise" required>
+          <option value="">Select or type below...</option>
+          <optgroup label="Chest">
+            <option value="Bench Press">Bench Press</option>
+            <option value="Incline Bench Press">Incline Bench Press</option>
+            <option value="Dumbbell Flyes">Dumbbell Flyes</option>
+            <option value="Push Ups">Push Ups</option>
+            <option value="Cable Crossover">Cable Crossover</option>
+          </optgroup>
+          <optgroup label="Back">
+            <option value="Deadlift">Deadlift</option>
+            <option value="Pull Ups">Pull Ups</option>
+            <option value="Barbell Row">Barbell Row</option>
+            <option value="Lat Pulldown">Lat Pulldown</option>
+            <option value="Seated Cable Row">Seated Cable Row</option>
+          </optgroup>
+          <optgroup label="Legs">
+            <option value="Squat">Squat</option>
+            <option value="Leg Press">Leg Press</option>
+            <option value="Romanian Deadlift">Romanian Deadlift</option>
+            <option value="Lunges">Lunges</option>
+            <option value="Leg Curl">Leg Curl</option>
+            <option value="Calf Raises">Calf Raises</option>
+          </optgroup>
+          <optgroup label="Shoulders">
+            <option value="Overhead Press">Overhead Press</option>
+            <option value="Lateral Raises">Lateral Raises</option>
+            <option value="Face Pulls">Face Pulls</option>
+            <option value="Arnold Press">Arnold Press</option>
+          </optgroup>
+          <optgroup label="Arms">
+            <option value="Barbell Curl">Barbell Curl</option>
+            <option value="Tricep Pushdown">Tricep Pushdown</option>
+            <option value="Hammer Curl">Hammer Curl</option>
+            <option value="Skull Crushers">Skull Crushers</option>
+          </optgroup>
+          <optgroup label="Core">
+            <option value="Plank">Plank</option>
+            <option value="Crunches">Crunches</option>
+            <option value="Hanging Leg Raise">Hanging Leg Raise</option>
+            <option value="Cable Woodchop">Cable Woodchop</option>
+          </optgroup>
+          <optgroup label="Cardio">
+            <option value="Running">Running</option>
+            <option value="Cycling">Cycling</option>
+            <option value="Jump Rope">Jump Rope</option>
+            <option value="Rowing">Rowing</option>
+          </optgroup>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Or type custom exercise</label>
+        <input type="text" class="form-input" id="workout-custom" placeholder="e.g. Hip Thrust">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Muscle Group</label>
+        <select class="form-select" id="workout-muscle" required>
+          <option value="chest">Chest</option>
+          <option value="back">Back</option>
+          <option value="legs">Legs</option>
+          <option value="shoulders">Shoulders</option>
+          <option value="arms">Arms</option>
+          <option value="core">Core</option>
+          <option value="cardio">Cardio</option>
+          <option value="other">Other</option>
+        </select>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Sets</label>
+          <input type="number" class="form-input" id="workout-sets" placeholder="3" min="1" required>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Reps</label>
+          <input type="number" class="form-input" id="workout-reps" placeholder="10" min="1" required>
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Weight (kg)</label>
+        <input type="number" class="form-input" id="workout-weight" placeholder="60" min="0" step="0.5">
+      </div>
+      <button type="submit" class="btn btn-primary btn-lg" style="width:100; margin-top:var(--sp-sm);">Save Exercise</button>
+    </form>
+  </div>
+</div>
+
+<!-- Add Food Modal -->
+<div class="modal-overlay" id="modal-food">
+  <div class="modal">
+    <div class="modal-header">
+      <h3>Log Food</h3>
+      <button class="modal-close" data-close="modal-food">✕</button>
+    </div>
+    <form id="form-food">
+      <div class="form-group">
+        <label class="form-label">Quick Add</label>
+        <select class="form-select" id="food-preset">
+          <option value="">Select common food...</option>
+          <option value='{"n":"Chicken Breast (100g)","c":165,"p":31,"cb":0,"f":3.6}'>Chicken Breast (100g)</option>
+          <option value='{"n":"Brown Rice (100g)","c":112,"p":2.6,"cb":24,"f":0.9}'>Brown Rice (100g)</option>
+          <option value='{"n":"Egg (1 large)","c":72,"p":6.3,"cb":0.4,"f":4.8}'>Egg (1 large)</option>
+          <option value='{"n":"Banana","c":105,"p":1.3,"cb":27,"f":0.4}'>Banana</option>
+          <option value='{"n":"Oats (100g)","c":389,"p":16.9,"cb":66,"f":6.9}'>Oats (100g)</option>
+          <option value='{"n":"Whey Protein Scoop","c":120,"p":24,"cb":3,"f":1.5}'>Whey Protein Scoop</option>
+          <option value='{"n":"Peanut Butter (2 tbsp)","c":188,"p":8,"cb":6,"f":16}'>Peanut Butter (2 tbsp)</option>
+          <option value='{"n":"Greek Yogurt (150g)","c":100,"p":17,"cb":6,"f":0.7}'>Greek Yogurt (150g)</option>
+          <option value='{"n":"Sweet Potato (150g)","c":135,"p":2,"cb":31,"f":0.1}'>Sweet Potato (150g)</option>
+          <option value='{"n":"Salmon (100g)","c":208,"p":20,"cb":0,"f":13}'>Salmon (100g)</option>
+          <option value='{"n":"Avocado (half)","c":120,"p":1.5,"cb":6,"f":11}'>Avocado (half)</option>
+          <option value='{"n":"Milk (250ml)","c":150,"p":8,"cb":12,"f":8}'>Milk (250ml)</option>
+          <option value='{"n":"Paneer (100g)","c":265,"p":18.3,"cb":1.2,"f":20.8}'>Paneer (100g)</option>
+          <option value='{"n":"Dal (1 cup)","c":198,"p":13,"cb":34,"f":0.8}'>Dal (1 cup)</option>
+          <option value='{"n":"Chapati (1)","c":104,"p":3.1,"cb":18,"f":3.7}'>Chapati (1)</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Food Name</label>
+        <input type="text" class="form-input" id="food-name" placeholder="e.g. Grilled Chicken" required>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Calories</label>
+          <input type="number" class="form-input" id="food-calories" placeholder="250" min="0" required>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Protein (g)</label>
+          <input type="number" class="form-input" id="food-protein" placeholder="30" min="0" step="0.1">
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Carbs (g)</label>
+          <input type="number" class="form-input" id="food-carbs" placeholder="20" min="0" step="0.1">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Fat (g)</label>
+          <input type="number" class="form-input" id="food-fat" placeholder="8" min="0" step="0.1">
+        </div>
+      </div>
+      <button type="submit" class="btn btn-primary btn-lg" style="width:100%;margin-top:var(--sp-sm);">Save Food</button>
+    </form>
+  </div>
+</div>
+
+<!-- Toast Container -->
+<div class="toast-container" id="toast-container"></div>
+
+<script src="js/storage.js"></script>
+<script src="js/charts.js"></script>
+<script src="js/dashboard.js"></script>
+<script src="js/workouts.js"></script>
+<script src="js/nutrition.js"></script>
+<script src="js/progress.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>
