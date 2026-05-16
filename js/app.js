@@ -90,6 +90,7 @@ const App = (() => {
     if (btnAddFood) btnAddFood.addEventListener('click', () => openModal('modal-food'));
 
     // Init sub-modules
+    Auth.init();
     Settings.init();
     Timer.init();
     Workouts.init();

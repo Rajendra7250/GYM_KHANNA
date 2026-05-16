@@ -10,7 +10,10 @@ const Storage = (() => {
     try { return JSON.parse(localStorage.getItem(key)) || []; }
     catch { return []; }
   }
-  function _set(key, data) { localStorage.setItem(key, JSON.stringify(data)); }
+  function _set(key, data) {
+    localStorage.setItem(key, JSON.stringify(data));
+    if (window.Auth) Auth.queueSync();
+  }
 
   // Date helpers
   function todayStr() { return new Date().toISOString().slice(0, 10); }

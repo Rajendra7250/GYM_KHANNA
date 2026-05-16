@@ -13,6 +13,7 @@ const Settings = (() => {
 
   function saveSettings(s) {
     localStorage.setItem('gk_settings', JSON.stringify(s));
+    if (window.Auth) Auth.queueSync();
   }
 
   function render() {
