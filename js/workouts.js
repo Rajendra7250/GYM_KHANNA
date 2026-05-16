@@ -9,12 +9,31 @@ const Workouts = (() => {
   let sessionStartTime = null;
   let sessionInterval = null;
 
+  // Daily View State
+  let currentDate = new Date();
+
+  function getDateStr() {
+    return Storage.dateStr(currentDate);
+  }
+
+  function updateDateLabel() {
+    const label = document.getElementById('workout-date-label');
+    if (!label) return;
+    if (Storage.isToday(getDateStr())) {
+      label.textContent = 'Today';
+    } else {
+      label.textContent = Storage.formatDate(getDateStr());
+    }
+  }
+
   function render() {
     renderTemplates();
-    const groups = Storage.getWorkoutsGrouped();
+    updateDateLabel();
+    const ds = getDateStr();
+    const exercises = Storage.getWorkoutsByDate(ds);
     const container = document.getElementById('workout-list');
 
-    if (!groups.length) {
+    if (!exercises.length) {
       container.innerHTML = `
         <div class="empty-state">
           <div class="empty-state-icon">🏋️</div>
@@ -25,13 +44,10 @@ const Workouts = (() => {
       return;
     }
 
-    let html = '';
+    let html = '<div class="data-list">';
     const unit = Settings.getSettings().unit;
-    groups.forEach(([date, exercises]) => {
-      const label = Storage.isToday(date) ? 'Today' : Storage.formatDate(date);
-      html += `<div class="date-group"><div class="date-group-header">${label}</div><div class="data-list">`;
-      let currentSupersetId = null;
-      let supersetHtml = '';
+    let currentSupersetId = null;
+    let supersetHtml = '';
 
       exercises.forEach((ex, idx) => {
         const vol = (ex.sets || 0) * (ex.reps || 0) * (ex.weight || 0);
@@ -58,23 +74,22 @@ const Workouts = (() => {
           </div>
         `;
 
-        if (ex.supersetId) {
-          if (currentSupersetId !== ex.supersetId) {
-            currentSupersetId = ex.supersetId;
-          }
-          supersetHtml += itemHtml;
-          
-          if (idx === exercises.length - 1 || exercises[idx + 1].supersetId !== currentSupersetId) {
-            html += `<div class="superset-group">${supersetHtml}</div>`;
-            supersetHtml = '';
-            currentSupersetId = null;
-          }
-        } else {
-          html += itemHtml;
+      if (ex.supersetId) {
+        if (currentSupersetId !== ex.supersetId) {
+          currentSupersetId = ex.supersetId;
         }
-      });
-      html += '</div></div>';
+        supersetHtml += itemHtml;
+        
+        if (idx === exercises.length - 1 || exercises[idx + 1].supersetId !== currentSupersetId) {
+          html += `<div class="superset-group">${supersetHtml}</div>`;
+          supersetHtml = '';
+          currentSupersetId = null;
+        }
+      } else {
+        html += itemHtml;
+      }
     });
+    html += '</div>';
     container.innerHTML = html;
   }
 
@@ -108,11 +123,14 @@ const Workouts = (() => {
       if (w) supersetId = w.supersetId;
     }
 
+    const muscle = document.getElementById('workout-muscle').value;
+
     Storage.addWorkout({
       id: editId,
+      date: getDateStr(), // Use currently viewed date
       supersetId,
       exercise,
-      muscle: document.getElementById('workout-muscle').value,
+      muscle: muscle,
       sets: parseInt(document.getElementById('workout-sets').value) || 0,
       reps: parseInt(document.getElementById('workout-reps').value) || 0,
       weight: parseFloat(document.getElementById('workout-weight').value) || 0,
@@ -125,7 +143,15 @@ const Workouts = (() => {
     App.toast(editId ? 'Exercise updated' : 'Exercise logged! 💪', 'success');
     render();
     Dashboard.render();
-    Timer.start(90); // Start 90s rest timer
+
+    // Start rest timer if it's a new entry and not a superset
+    if (!editId && !isSuperset && window.Timer) {
+      const restTimers = Settings.getSettings().restTimers || {};
+      const timerSecs = restTimers[muscle] !== undefined ? parseInt(restTimers[muscle]) : 90;
+      if (timerSecs > 0) {
+        Timer.start(timerSecs);
+      }
+    }
   }
 
   function remove(id) {
@@ -227,6 +253,7 @@ const Workouts = (() => {
         }
         
         Storage.addWorkout({
+          date: getDateStr(),
           exercise: exName,
           muscle: muscle,
           sets: 3, // Default values
@@ -247,6 +274,13 @@ const Workouts = (() => {
       renderTemplates();
       App.toast('Routine deleted');
     });
+  }
+
+  function fillRoutine(name, exercises) {
+    const nameEl = document.getElementById('routine-name');
+    const exercisesEl = document.getElementById('routine-exercises');
+    if (nameEl) nameEl.value = name;
+    if (exercisesEl) exercisesEl.value = exercises;
   }
 
   // ===== SESSION TIMER =====
@@ -393,6 +427,12 @@ const Workouts = (() => {
     document.getElementById('form-workout').addEventListener('submit', handleSubmit);
     document.getElementById('form-routine').addEventListener('submit', handleRoutineSubmit);
     
+    // Date Navigation
+    const prevBtn = document.getElementById('workout-prev-day');
+    const nextBtn = document.getElementById('workout-next-day');
+    if (prevBtn) prevBtn.addEventListener('click', () => { currentDate.setDate(currentDate.getDate() - 1); render(); });
+    if (nextBtn) nextBtn.addEventListener('click', () => { currentDate.setDate(currentDate.getDate() + 1); render(); });
+
     const btnAddRoutine = document.getElementById('btn-add-routine');
     if (btnAddRoutine) btnAddRoutine.addEventListener('click', () => App.openModal('modal-routine'));
 
@@ -402,5 +442,5 @@ const Workouts = (() => {
     initPresetSync();
   }
 
-  return { render, renderTemplates, init, remove, edit, logRoutine, deleteRoutine, showHistory, toggleSession };
+  return { render, renderTemplates, init, remove, edit, logRoutine, deleteRoutine, showHistory, toggleSession, fillRoutine };
 })();

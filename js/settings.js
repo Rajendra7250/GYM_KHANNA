@@ -2,7 +2,8 @@
 const Settings = (() => {
   const DEFAULT = {
     calories: 2500, protein: 150, carbs: 250, fat: 65,
-    waterGoal: 3000, unit: 'kg', theme: 'dark'
+    waterGoal: 3000, unit: 'kg', theme: 'dark',
+    restTimers: { chest: 90, back: 90, legs: 120, shoulders: 90, arms: 60, core: 60, cardio: 0, other: 90 }
   };
 
   function applyTheme(theme) {
@@ -39,6 +40,31 @@ const Settings = (() => {
     const uEl = document.getElementById('set-unit');
     if (uEl) uEl.value = s.unit;
     applyTheme(s.theme || 'dark');
+
+    // Rest Timers
+    if (s.restTimers) {
+      ['chest', 'back', 'legs', 'shoulders', 'arms', 'core', 'cardio', 'other'].forEach(m => {
+        const el = document.getElementById('timer-' + m);
+        if (el) el.value = s.restTimers[m];
+      });
+    }
+  }
+
+  function handleSaveTimers(e) {
+    e.preventDefault();
+    const s = getSettings();
+    s.restTimers = {
+      chest: parseInt(document.getElementById('timer-chest').value) || 90,
+      back: parseInt(document.getElementById('timer-back').value) || 90,
+      legs: parseInt(document.getElementById('timer-legs').value) || 120,
+      shoulders: parseInt(document.getElementById('timer-shoulders').value) || 90,
+      arms: parseInt(document.getElementById('timer-arms').value) || 60,
+      core: parseInt(document.getElementById('timer-core').value) || 60,
+      cardio: parseInt(document.getElementById('timer-cardio').value) || 0,
+      other: parseInt(document.getElementById('timer-other').value) || 90,
+    };
+    saveSettings(s);
+    App.toast("Rest timers saved!", "success");
   }
 
   function handleSave(e) {
@@ -102,6 +128,9 @@ const Settings = (() => {
   function init() {
     const form = document.getElementById('form-settings');
     if (form) form.addEventListener('submit', handleSave);
+
+    const timerForm = document.getElementById('form-timers');
+    if (timerForm) timerForm.addEventListener('submit', handleSaveTimers);
     
     const btnExp = document.getElementById('btn-export');
     if (btnExp) btnExp.addEventListener('click', exportData);

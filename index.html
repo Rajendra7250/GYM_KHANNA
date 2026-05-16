@@ -132,8 +132,18 @@
         <!-- Templates injected here -->
       </div>
 
+      <div class="date-nav" style="margin-bottom:var(--sp-md);">
+        <button class="btn-icon" id="workout-prev-day">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15 18 9 12 15 6"/></svg>
+        </button>
+        <span class="date-nav-label" id="workout-date-label">Today</span>
+        <button class="btn-icon" id="workout-next-day">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg>
+        </button>
+      </div>
+
       <div class="section-title">
-        <h3>Exercise Log</h3>
+        <h3 id="workout-log-title">Exercise Log</h3>
         <button class="btn btn-primary" id="btn-add-workout">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
           Add Exercise
@@ -304,6 +314,31 @@
             <div class="form-group"></div>
           </div>
           <button type="submit" class="btn btn-primary" style="margin-top:var(--sp-sm);">Save Settings</button>
+          <button type="submit" class="btn btn-primary" style="margin-top:var(--sp-sm);">Save Settings</button>
+        </form>
+      </div>
+
+      <!-- Custom Rest Timers -->
+      <div class="card" style="margin-bottom: var(--sp-xl);">
+        <div class="section-title"><h3>Rest Timers (seconds)</h3></div>
+        <form id="form-timers">
+          <div class="form-row">
+            <div class="form-group"><label class="form-label">Chest</label><input type="number" class="form-input" id="timer-chest" required></div>
+            <div class="form-group"><label class="form-label">Back</label><input type="number" class="form-input" id="timer-back" required></div>
+          </div>
+          <div class="form-row">
+            <div class="form-group"><label class="form-label">Legs</label><input type="number" class="form-input" id="timer-legs" required></div>
+            <div class="form-group"><label class="form-label">Shoulders</label><input type="number" class="form-input" id="timer-shoulders" required></div>
+          </div>
+          <div class="form-row">
+            <div class="form-group"><label class="form-label">Arms</label><input type="number" class="form-input" id="timer-arms" required></div>
+            <div class="form-group"><label class="form-label">Core</label><input type="number" class="form-input" id="timer-core" required></div>
+          </div>
+          <div class="form-row">
+            <div class="form-group"><label class="form-label">Cardio</label><input type="number" class="form-input" id="timer-cardio" required></div>
+            <div class="form-group"><label class="form-label">Other</label><input type="number" class="form-input" id="timer-other" required></div>
+          </div>
+          <button type="submit" class="btn btn-primary" style="margin-top:var(--sp-sm);">Save Timers</button>
         </form>
       </div>
 
@@ -457,6 +492,16 @@
       <button class="modal-close" data-close="modal-routine">✕</button>
     </div>
     <form id="form-routine">
+      <div style="margin-bottom:var(--sp-md);">
+        <label class="form-label">Quick Presets</label>
+        <div style="display:flex; flex-wrap:wrap; gap:var(--sp-sm);">
+          <button type="button" class="btn btn-ghost" onclick="Workouts.fillRoutine('Push Day', 'Bench Press, Overhead Press, Incline Dumbbell Press, Lateral Raises, Triceps Extension')">Push</button>
+          <button type="button" class="btn btn-ghost" onclick="Workouts.fillRoutine('Pull Day', 'Deadlift, Pull-ups, Barbell Row, Face Pulls, Bicep Curls')">Pull</button>
+          <button type="button" class="btn btn-ghost" onclick="Workouts.fillRoutine('Leg Day', 'Squat, Leg Press, Romanian Deadlift, Leg Extensions, Calf Raises')">Legs</button>
+          <button type="button" class="btn btn-ghost" onclick="Workouts.fillRoutine('Upper Body', 'Bench Press, Barbell Row, Overhead Press, Lat Pulldown')">Upper</button>
+          <button type="button" class="btn btn-ghost" onclick="Workouts.fillRoutine('Lower Body', 'Squat, Romanian Deadlift, Leg Press, Calf Raises')">Lower</button>
+        </div>
+      </div>
       <div class="form-group">
         <label class="form-label">Routine Name</label>
         <input type="text" class="form-input" id="routine-name" placeholder="e.g. Push Day" required>
