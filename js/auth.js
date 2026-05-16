@@ -138,6 +138,12 @@ const Auth = (() => {
         if (data.food) localStorage.setItem('gk_food', JSON.stringify(data.food));
         if (data.weight) localStorage.setItem('gk_weight', JSON.stringify(data.weight));
         if (data.settings) localStorage.setItem('gk_settings', JSON.stringify(data.settings));
+        if (data.templates) localStorage.setItem('gk_templates', JSON.stringify(data.templates));
+        if (data.measurements) localStorage.setItem('gk_measurements', JSON.stringify(data.measurements));
+        if (data.water) localStorage.setItem('gk_water', JSON.stringify(data.water));
+        if (data.sessions) localStorage.setItem('gk_sessions', JSON.stringify(data.sessions));
+        if (data.programs) localStorage.setItem('gk_programs', JSON.stringify(data.programs));
+        if (data.activeProgram) localStorage.setItem('gk_active_program', JSON.stringify(data.activeProgram));
 
         App.toast('Cloud data synced!', 'success');
 
@@ -163,6 +169,12 @@ const Auth = (() => {
         food: Storage.getFood(),
         weight: Storage.getWeightLog(),
         settings: Settings.getSettings(),
+        templates: Storage.getTemplates(),
+        measurements: Storage.getMeasurements(),
+        water: Storage.getWaterLog(),
+        sessions: Storage.getSessions(),
+        programs: Storage.getPrograms(),
+        activeProgram: Storage.getActiveProgram(),
         lastUpdated: Date.now()
       };
       try {
@@ -177,3 +189,5 @@ const Auth = (() => {
 
   return { init, queueSync, isUserLoggedIn: () => !!currentUser, handleAuthClick };
 })();
+
+window.Auth = Auth;
