@@ -2,7 +2,7 @@
 const Settings = (() => {
   const DEFAULT = {
     calories: 2500, protein: 150, carbs: 250, fat: 65,
-    unit: 'kg', theme: 'dark'
+    waterGoal: 3000, unit: 'kg', theme: 'dark'
   };
 
   function applyTheme(theme) {
@@ -34,6 +34,8 @@ const Settings = (() => {
     if (cEl) cEl.value = s.carbs;
     const fEl = document.getElementById('set-fat');
     if (fEl) fEl.value = s.fat;
+    const wgEl = document.getElementById('set-water-goal');
+    if (wgEl) wgEl.value = s.waterGoal || 3000;
     const uEl = document.getElementById('set-unit');
     if (uEl) uEl.value = s.unit;
     applyTheme(s.theme || 'dark');
@@ -46,6 +48,7 @@ const Settings = (() => {
       protein: parseInt(document.getElementById('set-protein').value) || 150,
       carbs: parseInt(document.getElementById('set-carbs').value) || 250,
       fat: parseInt(document.getElementById('set-fat').value) || 65,
+      waterGoal: parseInt(document.getElementById('set-water-goal').value) || 3000,
       unit: document.getElementById('set-unit').value,
       theme: getSettings().theme || 'dark'
     };

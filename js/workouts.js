@@ -297,13 +297,20 @@ const Workouts = (() => {
 
     // Build chart data: max weight per date
     const byDate = {};
+    const volByDate = {};
     all.forEach(w => {
       if (!byDate[w.date] || w.weight > byDate[w.date]) byDate[w.date] = w.weight || 0;
+      const vol = (w.sets || 0) * (w.reps || 0) * (w.weight || 0);
+      volByDate[w.date] = (volByDate[w.date] || 0) + vol;
     });
     const chartData = Object.entries(byDate)
       .sort((a, b) => a[0].localeCompare(b[0]))
       .map(([date, weight]) => ({ label: Storage.formatDate(date), value: weight }));
+    const volData = Object.entries(volByDate)
+      .sort((a, b) => a[0].localeCompare(b[0]))
+      .map(([date, vol]) => ({ label: Storage.formatDate(date), value: vol }));
 
+    // Weight progression chart
     const canvas = document.getElementById('chart-exercise-history');
     if (canvas && chartData.length > 1) {
       Charts.drawLineChart(canvas, chartData);
@@ -323,8 +330,45 @@ const Workouts = (() => {
       ctx.fillText('Need at least 2 sessions to show trend', rect.width / 2, 100);
     }
 
-    // Build list
+    // Volume trend chart
+    const volCanvas = document.getElementById('chart-exercise-volume');
+    if (volCanvas && volData.length > 1) {
+      Charts.drawBarChart(volCanvas, volData);
+    } else if (volCanvas) {
+      const ctx = volCanvas.getContext('2d');
+      const dpr = window.devicePixelRatio || 1;
+      const rect = volCanvas.parentElement.getBoundingClientRect();
+      volCanvas.width = rect.width * dpr;
+      volCanvas.height = 150 * dpr;
+      ctx.scale(dpr, dpr);
+      volCanvas.style.width = rect.width + 'px';
+      volCanvas.style.height = '150px';
+      ctx.clearRect(0, 0, rect.width, 150);
+      ctx.fillStyle = '#8a8a9a';
+      ctx.font = '13px Inter, sans-serif';
+      ctx.textAlign = 'center';
+      ctx.fillText('Need more data for volume trend', rect.width / 2, 75);
+    }
+
+    // 1RM Calculation (Epley Formula: weight × (1 + reps/30))
     const unit = Settings.getSettings().unit;
+    const rmBox = document.getElementById('exercise-1rm');
+    const rmVal = document.getElementById('exercise-1rm-value');
+    let best1RM = 0;
+    all.forEach(w => {
+      if (w.weight > 0 && w.reps > 0) {
+        const est = w.weight * (1 + w.reps / 30);
+        if (est > best1RM) best1RM = est;
+      }
+    });
+    if (best1RM > 0 && rmBox && rmVal) {
+      rmBox.style.display = 'block';
+      rmVal.textContent = best1RM.toFixed(1) + ' ' + unit;
+    } else if (rmBox) {
+      rmBox.style.display = 'none';
+    }
+
+    // Build list
     let listHtml = '';
     all.forEach(w => {
       const vol = (w.sets || 0) * (w.reps || 0) * (w.weight || 0);

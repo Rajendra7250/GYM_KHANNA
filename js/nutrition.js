@@ -233,7 +233,7 @@ const Nutrition = (() => {
 
   function renderWater(ds) {
     const ml = Storage.getWaterByDate(ds);
-    const goal = 3000;
+    const goal = Settings.getSettings().waterGoal || 3000;
     const pct = Math.min((ml / goal) * 100, 100);
     const fillEl = document.getElementById('water-fill');
     const amountEl = document.getElementById('water-amount');
