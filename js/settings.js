@@ -1,7 +1,7 @@
 /* ===== Settings & Utilities Module ===== */
 const Settings = (() => {
   const DEFAULT = {
-    protein: 150, carbs: 250, fat: 65,
+    calories: 2500, protein: 150, carbs: 250, fat: 65,
     unit: 'kg', theme: 'dark'
   };
 
@@ -26,6 +26,8 @@ const Settings = (() => {
 
   function render() {
     const s = getSettings();
+    const calEl = document.getElementById('set-calories');
+    if (calEl) calEl.value = s.calories;
     const pEl = document.getElementById('set-protein');
     if (pEl) pEl.value = s.protein;
     const cEl = document.getElementById('set-carbs');
@@ -40,6 +42,7 @@ const Settings = (() => {
   function handleSave(e) {
     e.preventDefault();
     const s = {
+      calories: parseInt(document.getElementById('set-calories').value) || 2500,
       protein: parseInt(document.getElementById('set-protein').value) || 150,
       carbs: parseInt(document.getElementById('set-carbs').value) || 250,
       fat: parseInt(document.getElementById('set-fat').value) || 65,

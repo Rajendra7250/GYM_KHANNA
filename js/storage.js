@@ -29,6 +29,14 @@ const Storage = (() => {
   function getWorkouts() { return _get(KEYS.workouts); }
   function addWorkout(w) {
     const all = getWorkouts();
+    if (w.id) {
+      const idx = all.findIndex(x => x.id === w.id);
+      if (idx !== -1) {
+        all[idx] = { ...all[idx], ...w };
+        _set(KEYS.workouts, all);
+        return all[idx];
+      }
+    }
     w.id = Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
     w.date = w.date || todayStr();
     w.timestamp = Date.now();
@@ -72,6 +80,14 @@ const Storage = (() => {
   function getFood() { return _get(KEYS.food); }
   function addFood(f) {
     const all = getFood();
+    if (f.id) {
+      const idx = all.findIndex(x => x.id === f.id);
+      if (idx !== -1) {
+        all[idx] = { ...all[idx], ...f };
+        _set(KEYS.food, all);
+        return all[idx];
+      }
+    }
     f.id = Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
     f.date = f.date || todayStr();
     f.timestamp = Date.now();

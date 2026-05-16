@@ -51,10 +51,15 @@ const Nutrition = (() => {
 
     // Macro bars
     const settings = Settings.getSettings();
-    const goals = { protein: settings.protein, carbs: settings.carbs, fat: settings.fat };
+    const goals = { calories: settings.calories || 2500, protein: settings.protein, carbs: settings.carbs, fat: settings.fat };
     const macroEl = document.getElementById('macro-bars');
     if (macroEl) {
       macroEl.innerHTML = `
+        <div class="macro-row" style="margin-bottom:var(--sp-md);">
+          <div class="macro-label" style="color:var(--text-primary); font-weight:600;">Cals</div>
+          <div class="macro-track" style="height:12px;"><div class="macro-fill" style="background:var(--text-primary); width: ${Math.min((nutrition.calories / goals.calories) * 100, 100)}%"></div></div>
+          <div class="macro-value" style="width:70px; font-weight:700;">${nutrition.calories.toFixed(0)} <span style="font-size:0.7rem; color:var(--text-muted); font-weight:500;">/ ${goals.calories}</span></div>
+        </div>
         <div class="macro-row">
           <div class="macro-label">Protein</div>
           <div class="macro-track"><div class="macro-fill protein" style="width: ${Math.min((nutrition.protein / goals.protein) * 100, 100)}%"></div></div>
@@ -109,6 +114,9 @@ const Nutrition = (() => {
             </div>
             <div class="data-item-value">${(f.calories || 0).toLocaleString()} kcal</div>
             <div class="data-item-actions">
+              <button class="btn-icon" onclick="Nutrition.edit('${f.id}')" title="Edit">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
+              </button>
               <button class="btn-icon" onclick="Nutrition.remove('${f.id}')" title="Delete">
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2"/></svg>
               </button>
@@ -126,7 +134,10 @@ const Nutrition = (() => {
     const name = document.getElementById('food-name').value.trim();
     if (!name) { App.toast('Please enter a food name'); return; }
 
+    const editId = document.getElementById('form-food').dataset.editId;
+
     Storage.addFood({
+      id: editId,
       name,
       meal: document.getElementById('food-meal') ? document.getElementById('food-meal').value : 'Snack',
       calories: parseFloat(document.getElementById('food-calories').value) || 0,
@@ -137,17 +148,37 @@ const Nutrition = (() => {
     });
 
     document.getElementById('form-food').reset();
+    delete document.getElementById('form-food').dataset.editId;
     App.closeModal('modal-food');
-    App.toast('Food logged! 🍗', 'success');
+    App.toast(editId ? 'Food entry updated' : 'Food logged! 🍗', 'success');
     render();
     Dashboard.render();
   }
 
   function remove(id) {
-    Storage.deleteFood(id);
-    render();
-    Dashboard.render();
-    App.toast('Food entry removed');
+    App.confirm('Delete Food', 'Are you sure you want to remove this food log? This cannot be undone.', () => {
+      Storage.deleteFood(id);
+      render();
+      Dashboard.render();
+      App.toast('Food entry removed');
+    });
+  }
+
+  function edit(id) {
+    const ds = getDateStr();
+    const foods = Storage.getFoodByDate(ds);
+    const f = foods.find(x => x.id === id);
+    if (!f) return;
+    
+    document.getElementById('food-name').value = f.name;
+    document.getElementById('food-meal').value = f.meal || 'Snack';
+    document.getElementById('food-calories').value = f.calories || '';
+    document.getElementById('food-protein').value = f.protein || '';
+    document.getElementById('food-carbs').value = f.carbs || '';
+    document.getElementById('food-fat').value = f.fat || '';
+    
+    document.getElementById('form-food').dataset.editId = id;
+    App.openModal('modal-food');
   }
 
   function initPresetSync() {
@@ -191,5 +222,5 @@ const Nutrition = (() => {
     initPresetSync();
   }
 
-  return { render, init, remove };
+  return { render, init, remove, edit };
 })();

@@ -40,6 +40,9 @@ const Workouts = (() => {
             </div>
             ${vol > 0 ? `<div class="data-item-value">${vol.toLocaleString()} ${unit}</div>` : ''}
             <div class="data-item-actions">
+              <button class="btn-icon" onclick="Workouts.edit('${ex.id}')" title="Edit">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
+              </button>
               <button class="btn-icon" onclick="Workouts.remove('${ex.id}')" title="Delete">
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2"/></svg>
               </button>
@@ -59,7 +62,10 @@ const Workouts = (() => {
     const exercise = custom || selVal;
     if (!exercise) { App.toast('Please select or type an exercise'); return; }
 
+    const editId = document.getElementById('form-workout').dataset.editId;
+
     Storage.addWorkout({
+      id: editId,
       exercise,
       muscle: document.getElementById('workout-muscle').value,
       sets: parseInt(document.getElementById('workout-sets').value) || 0,
@@ -69,18 +75,35 @@ const Workouts = (() => {
     });
 
     document.getElementById('form-workout').reset();
+    delete document.getElementById('form-workout').dataset.editId;
     App.closeModal('modal-workout');
-    App.toast('Exercise logged! 💪', 'success');
+    App.toast(editId ? 'Exercise updated' : 'Exercise logged! 💪', 'success');
     render();
     Dashboard.render();
     Timer.start(90); // Start 90s rest timer
   }
 
   function remove(id) {
-    Storage.deleteWorkout(id);
-    render();
-    Dashboard.render();
-    App.toast('Exercise removed');
+    App.confirm('Delete Exercise', 'Are you sure you want to delete this exercise log? This cannot be undone.', () => {
+      Storage.deleteWorkout(id);
+      render();
+      Dashboard.render();
+      App.toast('Exercise removed');
+    });
+  }
+
+  function edit(id) {
+    const workouts = Storage.getWorkouts();
+    const w = workouts.find(x => x.id === id);
+    if (!w) return;
+    document.getElementById('workout-exercise').value = w.exercise;
+    document.getElementById('workout-muscle').value = w.muscle;
+    document.getElementById('workout-sets').value = w.sets;
+    document.getElementById('workout-reps').value = w.reps;
+    document.getElementById('workout-weight').value = w.weight || '';
+    document.getElementById('workout-notes').value = w.notes || '';
+    document.getElementById('form-workout').dataset.editId = id;
+    App.openModal('modal-workout');
   }
 
   // Auto-set muscle group when selecting preset exercise
@@ -104,5 +127,5 @@ const Workouts = (() => {
     initPresetSync();
   }
 
-  return { render, init, remove };
+  return { render, init, remove, edit };
 })();

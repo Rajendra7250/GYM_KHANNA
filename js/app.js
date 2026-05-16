@@ -47,6 +47,26 @@ const App = (() => {
     setTimeout(() => { if (t.parentElement) t.remove(); }, 3000);
   }
 
+  // Confirmation Dialog
+  function confirm(title, msg, onConfirm) {
+    const modal = document.getElementById('modal-confirm');
+    if (!modal) return;
+    document.getElementById('confirm-title').textContent = title;
+    document.getElementById('confirm-msg').textContent = msg;
+
+    const btnYes = document.getElementById('confirm-btn-yes');
+    // Remove old listeners to prevent multiple fires
+    const newBtnYes = btnYes.cloneNode(true);
+    btnYes.parentNode.replaceChild(newBtnYes, btnYes);
+
+    newBtnYes.addEventListener('click', () => {
+      closeModal('modal-confirm');
+      if (onConfirm) onConfirm();
+    });
+
+    openModal('modal-confirm');
+  }
+
   // Initialize app
   function init() {
     // Sidebar nav clicks
@@ -122,5 +142,7 @@ const App = (() => {
   // Start when DOM is ready
   document.addEventListener('DOMContentLoaded', init);
 
-  return { navigateTo, openModal, closeModal, toast };
+  return {
+    init, navigateTo, openModal, closeModal, toast, confirm
+  };
 })();

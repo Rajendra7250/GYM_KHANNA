@@ -195,11 +195,17 @@
               <option value="lbs">Pounds (lbs)</option>
             </select>
           </div>
-          <div class="form-row">
-            <div class="form-group">
+          <div class="form-row" style="margin-bottom:var(--sp-md);">
+            <div class="form-group" style="margin-bottom:0;">
+              <label class="form-label">Calorie Goal (kcal)</label>
+              <input type="number" class="form-input" id="set-calories" required>
+            </div>
+            <div class="form-group" style="margin-bottom:0;">
               <label class="form-label">Protein Goal (g)</label>
               <input type="number" class="form-input" id="set-protein" required>
             </div>
+          </div>
+          <div class="form-row">
             <div class="form-group">
               <label class="form-label">Carbs Goal (g)</label>
               <input type="number" class="form-input" id="set-carbs" required>
@@ -348,6 +354,18 @@
       </div>
       <button type="submit" class="btn btn-primary btn-lg" style="width:100%;margin-top:var(--sp-sm);">Save Food</button>
     </form>
+  </div>
+</div>
+
+<!-- Confirm Modal -->
+<div class="modal-overlay" id="modal-confirm">
+  <div class="modal" style="max-width:320px; text-align:center;">
+    <h3 style="margin-bottom:var(--sp-sm);" id="confirm-title">Are you sure?</h3>
+    <p style="color:var(--text-secondary); margin-bottom:var(--sp-lg);" id="confirm-msg">This action cannot be undone.</p>
+    <div style="display:flex; gap:var(--sp-md);">
+      <button class="btn btn-ghost" style="flex:1;" data-close="modal-confirm" id="confirm-btn-no">Cancel</button>
+      <button class="btn btn-primary" style="flex:1; background:var(--danger); color:white; box-shadow:none;" id="confirm-btn-yes">Delete</button>
+    </div>
   </div>
 </div>
 

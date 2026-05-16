@@ -44,7 +44,12 @@ const Dashboard = (() => {
       </div>
       <div class="stat-card fire">
         <div class="stat-card-icon">🔥</div>
-        <div class="stat-card-value">${streak}</div>
+        <div class="stat-card-value" style="display:flex; align-items:center; gap:8px;">
+          ${streak}
+          ${streak >= 100 ? '<span title="100-Day Streak" style="font-size:1.2rem; animation:badgePulse 2s infinite;">🥇</span>' : 
+            streak >= 30 ? '<span title="30-Day Streak" style="font-size:1.2rem; animation:badgePulse 2s infinite;">🥈</span>' : 
+            streak >= 7 ? '<span title="7-Day Streak" style="font-size:1.2rem; animation:badgePulse 2s infinite;">🥉</span>' : ''}
+        </div>
         <div class="stat-card-label">Day Streak</div>
       </div>
     `;
