@@ -176,6 +176,21 @@ const App = (() => {
     Programs.init();
     AI.init();
 
+    // Network Connectivity Listeners
+    window.addEventListener('offline', () => {
+      const banner = document.getElementById('offline-banner');
+      if (banner) banner.style.display = 'block';
+    });
+
+    window.addEventListener('online', () => {
+      const banner = document.getElementById('offline-banner');
+      if (banner) banner.style.display = 'none';
+      toast('Back online! Syncing data...', 'success');
+      if (window.Auth && window.Auth.isUserLoggedIn()) {
+        window.Auth.queueSync();
+      }
+    });
+
     // Render dashboard
     Dashboard.render();
 
@@ -289,10 +304,23 @@ const App = (() => {
     });
   }
 
+  // Troubleshooting
+  async function clearAppCache() {
+    if (confirm('This will clear all cached files and force a reload. Your data in LocalStorage will stay safe. Proceed?')) {
+      const names = await caches.keys();
+      await Promise.all(names.map(name => caches.delete(name)));
+      window.location.reload(true);
+    }
+  }
+
+  // Global Error Handler
+  window.addEventListener('error', (e) => {
+    console.error('GymKhanna Global Error:', e.message);
+    toast('App error: ' + e.message, 'error');
+  });
+
   // Start when DOM is ready
   document.addEventListener('DOMContentLoaded', init);
 
-  return {
-    init, navigateTo, openModal, closeModal, toast, confirm, haptic, animateNumber
-  };
+  return { navigateTo, openModal, closeModal, toast, animateNumber, init, clearAppCache };
 })();

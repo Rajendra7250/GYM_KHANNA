@@ -12,6 +12,10 @@
   <meta name="theme-color" content="#1a1a1e">
 </head>
 <body>
+<!-- Offline Banner -->
+<div id="offline-banner" style="display:none; position:fixed; top:0; left:0; right:0; background:var(--danger); color:white; text-align:center; padding:var(--sp-sm); font-size:0.85rem; font-weight:600; z-index:9999; box-shadow:0 2px 4px rgba(0,0,0,0.3);">
+  You are currently offline. Changes are saved locally and will sync when you reconnect.
+</div>
 
 <div class="bg-ambience"></div>
 
@@ -52,7 +56,7 @@
       <button class="btn btn-ghost" id="btn-auth" onclick="Auth.handleAuthClick(event)" style="width:100%; justify-content:center; gap:var(--sp-sm);">
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg> <span>Login to Sync</span>
       </button>
-      <div style="text-align:center; font-size:0.7rem; color:var(--text-muted); margin-top:var(--sp-md); font-weight:600; letter-spacing:1px;">v1.0.0</div>
+      <div style="text-align:center; font-size:0.7rem; color:var(--text-muted); margin-top:var(--sp-md); font-weight:600; letter-spacing:1px;">v1.0.1</div>
     </div>
   </aside>
 
@@ -457,10 +461,16 @@
             <input type="file" id="file-import" accept=".json" style="display:none;">
           </label>
         </div>
-        <button class="btn btn-primary" id="btn-force-sync" style="width:100%; margin-top:var(--sp-md); background:var(--primary); color:black;">☁️ Force Cloud Sync</button>
+        <div style="margin-top:var(--sp-xl); padding-top:var(--sp-lg); border-top:1px solid var(--border-glass);">
+          <div class="section-title"><h3>Troubleshooting</h3></div>
+          <p style="font-size:0.8rem; color:var(--text-secondary); margin-bottom:var(--sp-md);">If the app feels stuck or isn't updating, try clearing the local cache.</p>
+          <button class="btn btn-danger" style="width:100%; justify-content:center;" onclick="App.clearAppCache()">
+            Reset App Cache & Reload
+          </button>
+        </div>
       </div>
       <div style="text-align:center; padding-bottom:var(--sp-xl); font-size:0.75rem; color:var(--text-muted); font-weight:600; letter-spacing:1px;">
-        GymKhanna v1.0.0
+        GymKhanna v1.0.1
       </div>
     </section>
   </main>

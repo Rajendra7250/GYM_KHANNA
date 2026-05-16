@@ -142,18 +142,6 @@ const Settings = (() => {
     const fileImp = document.getElementById('file-import');
     if (fileImp) fileImp.addEventListener('change', importData);
 
-    const btnForceSync = document.getElementById('btn-force-sync');
-    if (btnForceSync) {
-      btnForceSync.addEventListener('click', () => {
-        if (window.Auth && window.Auth.isUserLoggedIn()) {
-          window.Auth.queueSync();
-          App.toast("Forcing cloud sync...", "success");
-        } else {
-          App.toast("Please log in first", "danger");
-        }
-      });
-    }
-
     // Theme toggle
     const themeToggle = document.getElementById('theme-toggle');
     if (themeToggle) {

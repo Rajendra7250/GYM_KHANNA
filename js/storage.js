@@ -295,6 +295,10 @@ const Storage = (() => {
     return result;
   }
 
+  function getWeeklyActivity() {
+    return getVolumeOverTime(7);
+  }
+
   function getWeeklyComparison() {
     const all = getWorkouts();
     const allFood = getFood();
