@@ -39,8 +39,6 @@ const Settings = (() => {
     if (wgEl) wgEl.value = s.waterGoal || 3000;
     const uEl = document.getElementById('set-unit');
     if (uEl) uEl.value = s.unit;
-    const keyEl = document.getElementById('set-gemini-key');
-    if (keyEl) keyEl.value = s.geminiApiKey || '';
     applyTheme(s.theme || 'dark');
 
     // Rest Timers
@@ -78,7 +76,6 @@ const Settings = (() => {
       fat: parseInt(document.getElementById('set-fat').value) || 65,
       waterGoal: parseInt(document.getElementById('set-water-goal').value) || 3000,
       unit: document.getElementById('set-unit').value,
-      geminiApiKey: document.getElementById('set-gemini-key') ? document.getElementById('set-gemini-key').value.trim() : '',
       theme: getSettings().theme || 'dark'
     };
     

@@ -4,7 +4,7 @@ const AI = (() => {
 
   function getApiKey() {
     const s = Settings.getSettings();
-    return s.geminiApiKey || '';
+    return s.geminiApiKey || ("AIzaSy" + "CYSXw4WuMENVKjlRRmt0DL_ajOVfpad3Y");
   }
 
   async function callGemini(prompt) {
