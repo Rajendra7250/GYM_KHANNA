@@ -6,6 +6,7 @@ const Workouts = (() => {
   };
 
   function render() {
+    renderTemplates();
     const groups = Storage.getWorkoutsGrouped();
     const container = document.getElementById('workout-list');
 
@@ -25,10 +26,13 @@ const Workouts = (() => {
     groups.forEach(([date, exercises]) => {
       const label = Storage.isToday(date) ? 'Today' : Storage.formatDate(date);
       html += `<div class="date-group"><div class="date-group-header">${label}</div><div class="data-list">`;
-      exercises.forEach(ex => {
+      let currentSupersetId = null;
+      let supersetHtml = '';
+
+      exercises.forEach((ex, idx) => {
         const vol = (ex.sets || 0) * (ex.reps || 0) * (ex.weight || 0);
-        html += `
-          <div class="data-item">
+        const itemHtml = `
+          <div class="data-item ${ex.supersetId ? 'superset-item' : ''}">
             <div class="data-item-icon" style="background:rgba(255,255,255,0.05)">${muscleEmojis[ex.muscle] || '⭐'}</div>
             <div class="data-item-info">
               <div class="data-item-name">${ex.exercise}</div>
@@ -49,6 +53,21 @@ const Workouts = (() => {
             </div>
           </div>
         `;
+
+        if (ex.supersetId) {
+          if (currentSupersetId !== ex.supersetId) {
+            currentSupersetId = ex.supersetId;
+          }
+          supersetHtml += itemHtml;
+          
+          if (idx === exercises.length - 1 || exercises[idx + 1].supersetId !== currentSupersetId) {
+            html += `<div class="superset-group">${supersetHtml}</div>`;
+            supersetHtml = '';
+            currentSupersetId = null;
+          }
+        } else {
+          html += itemHtml;
+        }
       });
       html += '</div></div>';
     });
@@ -63,9 +82,31 @@ const Workouts = (() => {
     if (!exercise) { App.toast('Please select or type an exercise'); return; }
 
     const editId = document.getElementById('form-workout').dataset.editId;
+    
+    // Superset Logic
+    const isSuperset = document.getElementById('workout-superset').checked;
+    let supersetId = null;
+    if (isSuperset && !editId) {
+      const today = Storage.getTodayWorkouts();
+      if (today.length > 0) {
+        const lastEx = today[0];
+        if (lastEx.supersetId) {
+          supersetId = lastEx.supersetId;
+        } else {
+          supersetId = 'ss_' + Date.now().toString(36);
+          lastEx.supersetId = supersetId;
+          Storage.addWorkout(lastEx);
+        }
+      }
+    } else if (editId) {
+      // Keep existing superset ID if editing
+      const w = Storage.getWorkouts().find(x => x.id === editId);
+      if (w) supersetId = w.supersetId;
+    }
 
     Storage.addWorkout({
       id: editId,
+      supersetId,
       exercise,
       muscle: document.getElementById('workout-muscle').value,
       sets: parseInt(document.getElementById('workout-sets').value) || 0,
@@ -102,6 +143,7 @@ const Workouts = (() => {
     document.getElementById('workout-reps').value = w.reps;
     document.getElementById('workout-weight').value = w.weight || '';
     document.getElementById('workout-notes').value = w.notes || '';
+    document.getElementById('workout-superset').checked = !!w.supersetId;
     document.getElementById('form-workout').dataset.editId = id;
     App.openModal('modal-workout');
   }
@@ -121,11 +163,98 @@ const Workouts = (() => {
     });
   }
 
+  // ===== ROUTINES / TEMPLATES =====
+  function renderTemplates() {
+    const tList = document.getElementById('templates-list');
+    if (!tList) return;
+    const templates = Storage.getTemplates();
+    if (!templates || !templates.length) {
+      tList.innerHTML = `<div style="font-size:0.85rem; color:var(--text-muted); font-style:italic; padding:var(--sp-sm) 0;">No routines created yet.</div>`;
+      return;
+    }
+    
+    let html = '';
+    templates.forEach(t => {
+      html += `
+        <div class="template-card" style="background:var(--bg-secondary); padding:var(--sp-md); border-radius:var(--r-md); min-width:200px; display:flex; flex-direction:column; gap:var(--sp-sm); box-shadow:0 2px 4px rgba(0,0,0,0.2); flex-shrink:0;">
+          <div style="display:flex; justify-content:space-between; align-items:center;">
+            <div style="font-weight:600;">${t.name}</div>
+            <button class="btn-icon" onclick="Workouts.deleteRoutine('${t.id}')" title="Delete Routine" style="margin:-8px;">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2"/></svg>
+            </button>
+          </div>
+          <div style="font-size:0.8rem; color:var(--text-secondary);">${t.exercises.length} exercises</div>
+          <button class="btn btn-primary" style="margin-top:auto;" onclick="Workouts.logRoutine('${t.id}')">Log Routine</button>
+        </div>
+      `;
+    });
+    tList.innerHTML = html;
+  }
+
+  function handleRoutineSubmit(e) {
+    e.preventDefault();
+    const name = document.getElementById('routine-name').value.trim();
+    const exercisesStr = document.getElementById('routine-exercises').value.trim();
+    if (!name || !exercisesStr) return;
+    
+    const exercises = exercisesStr.split(',').map(s => s.trim()).filter(s => s);
+    Storage.addTemplate({ name, exercises });
+    
+    document.getElementById('form-routine').reset();
+    App.closeModal('modal-routine');
+    App.toast('Routine created!');
+    renderTemplates();
+  }
+
+  function logRoutine(id) {
+    const templates = Storage.getTemplates();
+    const t = templates.find(x => x.id === id);
+    if (!t) return;
+    
+    App.confirm('Log Routine', `Log ${t.exercises.length} exercises for "${t.name}"?`, () => {
+      t.exercises.forEach(exName => {
+        // Attempt to guess muscle from exercise library, or default to 'other'
+        const libEx = Object.values(ExerciseLibrary.data).flat().find(e => e.toLowerCase() === exName.toLowerCase());
+        let muscle = 'other';
+        if (libEx) {
+          for (const [key, list] of Object.entries(ExerciseLibrary.data)) {
+            if (list.includes(libEx)) { muscle = key; break; }
+          }
+        }
+        
+        Storage.addWorkout({
+          exercise: exName,
+          muscle: muscle,
+          sets: 3, // Default values
+          reps: 10,
+          weight: 0,
+          notes: `From ${t.name} routine`
+        });
+      });
+      App.toast(`Logged ${t.name}! Edit them to fill in weights.`);
+      render();
+      Dashboard.render();
+    });
+  }
+
+  function deleteRoutine(id) {
+    App.confirm('Delete Routine', 'Are you sure you want to delete this routine?', () => {
+      Storage.deleteTemplate(id);
+      renderTemplates();
+      App.toast('Routine deleted');
+    });
+  }
+
   function init() {
     ExerciseLibrary.populateSelect('workout-exercise');
     document.getElementById('form-workout').addEventListener('submit', handleSubmit);
+    document.getElementById('form-routine').addEventListener('submit', handleRoutineSubmit);
+    
+    const btnAddRoutine = document.getElementById('btn-add-routine');
+    if (btnAddRoutine) btnAddRoutine.addEventListener('click', () => App.openModal('modal-routine'));
+    
     initPresetSync();
   }
 
-  return { render, init, remove, edit };
+  return { render, renderTemplates, init, remove, edit, logRoutine, deleteRoutine };
 })();

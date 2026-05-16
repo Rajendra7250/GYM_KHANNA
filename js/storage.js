@@ -4,6 +4,7 @@ const Storage = (() => {
     workouts: 'gk_workouts',
     food: 'gk_food',
     weight: 'gk_weight',
+    templates: 'gk_templates',
   };
 
   function _get(key) {
@@ -62,7 +63,21 @@ const Storage = (() => {
     return Object.entries(groups).sort((a, b) => b[0].localeCompare(a[0]));
   }
 
-  // Weekly workout counts (last 7 days)
+  // ===== WORKOUT TEMPLATES =====
+  function getTemplates() { return _get(KEYS.templates); }
+  function addTemplate(t) {
+    const all = getTemplates();
+    t.id = Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
+    all.push(t);
+    _set(KEYS.templates, all);
+    return t;
+  }
+  function deleteTemplate(id) {
+    const all = getTemplates().filter(x => x.id !== id);
+    _set(KEYS.templates, all);
+  }
+
+  // ===== WEEKLY / ACTIVITY =====
   function getWeeklyActivity() {
     const all = getWorkouts();
     const days = [];
@@ -167,6 +182,7 @@ const Storage = (() => {
   return {
     todayStr, dateStr, formatDate, isToday,
     getWorkouts, addWorkout, deleteWorkout, getTodayWorkouts, getWorkoutsByDate, getWorkoutsGrouped, getWeeklyActivity,
+    getTemplates, addTemplate, deleteTemplate,
     getFood, addFood, deleteFood, getFoodByDate, getDailyNutrition,
     getWeightLog, addWeight, getLatestWeight,
     getStreak, getPersonalRecords, getTotalVolume, getTotalWorkouts,

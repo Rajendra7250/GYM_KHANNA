@@ -110,6 +110,16 @@
         <p>Track every set, rep, and PR</p>
       </div>
       <div class="section-title">
+        <h3>Templates & Routines</h3>
+        <button class="btn btn-ghost" id="btn-add-routine">
+          + New Routine
+        </button>
+      </div>
+      <div class="templates-list" id="templates-list" style="display:flex; gap:var(--sp-md); overflow-x:auto; padding-bottom:var(--sp-md); margin-bottom:var(--sp-lg);">
+        <!-- Templates injected here -->
+      </div>
+
+      <div class="section-title">
         <h3>Exercise Log</h3>
         <button class="btn btn-primary" id="btn-add-workout">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
@@ -285,6 +295,10 @@
         <label class="form-label">Notes</label>
         <input type="text" class="form-input" id="workout-notes" placeholder="e.g. felt easy, go heavier next time">
       </div>
+      <div class="form-group" style="display:flex; align-items:center; gap:var(--sp-sm);">
+        <input type="checkbox" id="workout-superset" style="width:16px; height:16px; accent-color:var(--primary);">
+        <label for="workout-superset" style="font-size:0.9rem; color:var(--text-secondary); cursor:pointer;">Link as Superset with previous exercise</label>
+      </div>
       <button type="submit" class="btn btn-primary btn-lg" style="width:100%; margin-top:var(--sp-sm);">Save Exercise</button>
     </form>
   </div>
@@ -353,6 +367,27 @@
         </div>
       </div>
       <button type="submit" class="btn btn-primary btn-lg" style="width:100%;margin-top:var(--sp-sm);">Save Food</button>
+    </form>
+  </div>
+</div>
+
+<!-- Add Routine Modal -->
+<div class="modal-overlay" id="modal-routine">
+  <div class="modal">
+    <div class="modal-header">
+      <h3>Create Routine</h3>
+      <button class="modal-close" data-close="modal-routine">✕</button>
+    </div>
+    <form id="form-routine">
+      <div class="form-group">
+        <label class="form-label">Routine Name</label>
+        <input type="text" class="form-input" id="routine-name" placeholder="e.g. Push Day" required>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Exercises (Comma separated)</label>
+        <input type="text" class="form-input" id="routine-exercises" placeholder="e.g. Bench Press, Overhead Press, Triceps Extension" required>
+      </div>
+      <button type="submit" class="btn btn-primary btn-lg" style="width:100%; margin-top:var(--sp-sm);">Save Routine</button>
     </form>
   </div>
 </div>

@@ -485,6 +485,38 @@ h1,h2,h3,h4,h5,h6 { font-family: 'Outfit', sans-serif; font-weight: 700; letter-
   .rest-timer { bottom: calc(80px + var(--sp-md)); }
 }
 
+/* ===== Templates & Routines ===== */
+.template-card {
+  transition: transform var(--transition) ease;
+  border: 1px solid rgba(255,255,255,0.05);
+}
+.template-card:hover {
+  transform: translateY(-2px);
+}
+
+/* ===== Supersets ===== */
+.superset-group {
+  position: relative;
+  padding-left: 16px;
+  margin-bottom: var(--sp-sm);
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-sm);
+}
+.superset-group::before {
+  content: '';
+  position: absolute;
+  top: 8px;
+  bottom: 8px;
+  left: 0;
+  width: 4px;
+  background: var(--primary);
+  border-radius: var(--r-full);
+}
+.superset-item {
+  margin-bottom: 0 !important;
+}
+
 /* ===== Badges ===== */
 @keyframes badgePulse {
   0%, 100% { transform: scale(1) rotate(0deg); }
