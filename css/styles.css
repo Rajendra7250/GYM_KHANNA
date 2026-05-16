@@ -22,6 +22,10 @@
   --success: #6ec87a;
   --danger: #d45d5d;
   --warning: #c4a84a;
+  --primary: #8b8bf5;
+  --border: rgba(255,255,255,0.07);
+  --bg-tertiary: rgba(255,255,255,0.02);
+  --transition: 0.3s;
   --sp-xs: 4px; --sp-sm: 8px; --sp-md: 16px; --sp-lg: 24px; --sp-xl: 32px; --sp-2xl: 48px;
   --r-sm: 8px; --r-md: 12px; --r-lg: 16px; --r-xl: 20px; --r-full: 9999px;
   --shadow-glow: 0 0 30px rgba(0,0,0,0.2);
@@ -77,6 +81,12 @@
 .theme-switch input:checked + .slider::before { transform: translateX(24px); background: #fff; }
 
 *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+/* Eliminate 300ms tap delay on mobile */
+a, button, .btn, .btn-icon, .quick-action, .bottom-nav-item, .nav-item, .tab, .data-item {
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+}
 
 html { font-size: 16px; scroll-behavior: smooth; }
 
@@ -155,7 +165,7 @@ h1,h2,h3,h4,h5,h6 { font-family: 'Outfit', sans-serif; font-weight: 700; letter-
 /* Main Content */
 .main-content {
   flex: 1; margin-left: 240px; padding: var(--sp-xl) var(--sp-xl) 100px;
-  min-height: 100vh; max-width: 1200px;
+  min-height: 100vh; max-width: 1200px; margin-right: auto;
 }
 
 /* ===== Page Sections ===== */
@@ -420,8 +430,9 @@ h1,h2,h3,h4,h5,h6 { font-family: 'Outfit', sans-serif; font-weight: 700; letter-
 .bottom-nav-items { display: flex; justify-content: space-around; }
 .bottom-nav-item {
   display: flex; flex-direction: column; align-items: center; gap: 2px;
-  padding: var(--sp-xs) var(--sp-md); color: var(--text-muted); cursor: pointer;
+  padding: var(--sp-sm) var(--sp-md); color: var(--text-muted); cursor: pointer;
   transition: all 0.25s ease; text-decoration: none; border: none; background: none;
+  min-height: 48px; justify-content: center;
 }
 .bottom-nav-item.active { color: var(--text-primary); }
 .bottom-nav-item svg { width: 22px; height: 22px; }
@@ -438,7 +449,17 @@ h1,h2,h3,h4,h5,h6 { font-family: 'Outfit', sans-serif; font-weight: 700; letter-
   display: none; /* hidden on desktop */
 }
 
-/* ===== Responsive ===== */
+/* ===== Responsive — Tablet ===== */
+@media (max-width: 1024px) and (min-width: 769px) {
+  .sidebar { width: 200px; }
+  .sidebar-logo h1 { font-size: 1.15rem; }
+  .main-content { margin-left: 200px; padding: var(--sp-lg) var(--sp-lg) 60px; }
+  .stat-cards { grid-template-columns: repeat(3, 1fr); }
+  .quick-actions { gap: var(--sp-sm); }
+  .quick-action { padding: var(--sp-md); }
+}
+
+/* ===== Responsive — Mobile ===== */
 @media (max-width: 768px) {
   /* Prevent ANY horizontal overflow */
   html, body { overflow-x: hidden; max-width: 100vw; }
@@ -522,9 +543,9 @@ h1,h2,h3,h4,h5,h6 { font-family: 'Outfit', sans-serif; font-weight: 700; letter-
   /* PR grid */
   .pr-grid { grid-template-columns: 1fr 1fr; gap: var(--sp-sm); }
 
-  /* Toast */
-  .toast-container { right: var(--sp-md); left: var(--sp-md); top: var(--sp-md); }
-  .toast { font-size: 0.78rem; padding: var(--sp-sm) var(--sp-md); }
+  /* Toast — position above bottom nav */
+  .toast-container { right: var(--sp-md); left: var(--sp-md); bottom: calc(80px + var(--sp-md)); top: auto; }
+  .toast { font-size: 0.78rem; padding: var(--sp-sm) var(--sp-md); min-width: auto; }
 
   /* Template cards */
   .template-card { padding: var(--sp-md); }
@@ -556,17 +577,7 @@ h1,h2,h3,h4,h5,h6 { font-family: 'Outfit', sans-serif; font-weight: 700; letter-
   .pr-grid { grid-template-columns: 1fr; }
 }
 
-/* ===== Toasts ===== */
-.toast-container { position: fixed; top: var(--sp-lg); right: var(--sp-lg); z-index: 2000; display: flex; flex-direction: column; gap: var(--sp-sm); }
-.toast {
-  padding: var(--sp-md) var(--sp-lg); background: var(--bg-secondary);
-  border: 1px solid var(--border-glass); border-radius: var(--r-md);
-  font-size: 0.85rem; animation: toastIn 0.3s ease, toastOut 0.3s ease 2.5s forwards;
-  display: flex; align-items: center; gap: var(--sp-sm);
-}
-.toast.success { border-left: 3px solid var(--success); }
-@keyframes toastIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
-@keyframes toastOut { from { opacity: 1; } to { opacity: 0; transform: translateY(-10px); } }
+/* (Toast styles consolidated below in the canonical toast block) */
 
 /* ===== Weight Input Row ===== */
 .weight-input-row {

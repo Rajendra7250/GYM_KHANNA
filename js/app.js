@@ -306,7 +306,7 @@ const App = (() => {
 
   // Troubleshooting
   async function clearAppCache() {
-    if (confirm('This will clear all cached files and force a reload. Your data in LocalStorage will stay safe. Proceed?')) {
+    if (window.confirm('This will clear all cached files and force a reload. Your data in LocalStorage will stay safe. Proceed?')) {
       const names = await caches.keys();
       await Promise.all(names.map(name => caches.delete(name)));
       window.location.reload(true);
