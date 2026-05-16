@@ -5,6 +5,10 @@ const Workouts = (() => {
     arms: '💪', core: '🎯', cardio: '🏃', other: '⭐',
   };
 
+  // Session Timer State
+  let sessionStartTime = null;
+  let sessionInterval = null;
+
   function render() {
     renderTemplates();
     const groups = Storage.getWorkoutsGrouped();
@@ -35,7 +39,7 @@ const Workouts = (() => {
           <div class="data-item ${ex.supersetId ? 'superset-item' : ''}">
             <div class="data-item-icon" style="background:rgba(255,255,255,0.05)">${muscleEmojis[ex.muscle] || '⭐'}</div>
             <div class="data-item-info">
-              <div class="data-item-name clickable" onclick="Workouts.showHistory('${ex.exercise}')">${ex.exercise}</div>
+              <div class="data-item-name" style="cursor:pointer; text-decoration:underline; text-decoration-color:var(--text-muted); text-underline-offset:3px;" onclick="Workouts.showHistory('${ex.exercise.replace(/'/g, "\\'")}')">${ex.exercise}</div>
               <div class="data-item-meta">
                 <span class="muscle-tag ${ex.muscle}">${ex.muscle}</span>
                 &nbsp; ${ex.sets}×${ex.reps} ${ex.weight ? '@ ' + ex.weight + unit : ''}
@@ -245,41 +249,99 @@ const Workouts = (() => {
     });
   }
 
-  function showHistory(name) {
-    const workouts = Storage.getWorkouts().filter(w => w.exercise === name);
-    document.getElementById('history-title').textContent = `${name} History`;
-    
-    const list = document.getElementById('history-list');
-    if (workouts.length === 0) {
-      list.innerHTML = `<div class="empty-state">No history for this exercise.</div>`;
-    } else {
-      let html = '';
-      workouts.forEach(w => {
-        html += `
-          <div class="data-item">
-            <div class="data-item-info">
-              <div class="data-item-name">${Storage.formatDate(w.date)}</div>
-              <div class="data-item-meta">${w.sets}×${w.reps} @ ${w.weight || 0} ${Settings.getSettings().unit}</div>
-            </div>
-            <div class="data-item-value">${((w.sets || 0) * (w.reps || 0) * (w.weight || 0)).toLocaleString()}</div>
-          </div>
-        `;
-      });
-      list.innerHTML = html;
-    }
+  // ===== SESSION TIMER =====
+  function formatDuration(ms) {
+    const s = Math.floor(ms / 1000);
+    const h = Math.floor(s / 3600);
+    const m = Math.floor((s % 3600) / 60);
+    const sec = s % 60;
+    return `${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}:${String(sec).padStart(2,'0')}`;
+  }
 
-    const canvas = document.getElementById('chart-history');
-    if (workouts.length > 0) {
-      const chartData = workouts.slice().reverse().map(w => ({
-        label: Storage.formatDate(w.date),
-        value: w.weight || 0
-      }));
+  function updateSessionClock() {
+    if (!sessionStartTime) return;
+    const elapsed = Date.now() - sessionStartTime;
+    const clockEl = document.getElementById('session-clock');
+    if (clockEl) clockEl.textContent = formatDuration(elapsed);
+  }
+
+  function toggleSession() {
+    const btn = document.getElementById('btn-session-toggle');
+    if (!sessionStartTime) {
+      // Start
+      sessionStartTime = Date.now();
+      sessionInterval = setInterval(updateSessionClock, 1000);
+      if (btn) { btn.textContent = 'End Workout'; btn.style.background = 'var(--danger)'; }
+      App.toast('Workout started! 💪');
+    } else {
+      // End
+      const duration = Date.now() - sessionStartTime;
+      clearInterval(sessionInterval);
+      Storage.addSession({ duration, exercises: Storage.getTodayWorkouts().length });
+      sessionStartTime = null;
+      sessionInterval = null;
+      const clockEl = document.getElementById('session-clock');
+      if (clockEl) clockEl.textContent = '00:00:00';
+      if (btn) { btn.textContent = 'Start Workout'; btn.style.background = ''; }
+      App.toast(`Workout done! ${formatDuration(duration)}`, 'success');
+      Dashboard.render();
+    }
+  }
+
+  // ===== EXERCISE HISTORY =====
+  function showHistory(exerciseName) {
+    const all = Storage.getWorkouts().filter(w => w.exercise === exerciseName);
+    if (!all.length) { App.toast('No history for this exercise'); return; }
+
+    document.getElementById('exercise-history-title').textContent = exerciseName + ' History';
+
+    // Build chart data: max weight per date
+    const byDate = {};
+    all.forEach(w => {
+      if (!byDate[w.date] || w.weight > byDate[w.date]) byDate[w.date] = w.weight || 0;
+    });
+    const chartData = Object.entries(byDate)
+      .sort((a, b) => a[0].localeCompare(b[0]))
+      .map(([date, weight]) => ({ label: Storage.formatDate(date), value: weight }));
+
+    const canvas = document.getElementById('chart-exercise-history');
+    if (canvas && chartData.length > 1) {
       Charts.drawLineChart(canvas, chartData);
-    } else {
-      Charts.drawEmptyState(canvas, 'No progression data');
+    } else if (canvas) {
+      const ctx = canvas.getContext('2d');
+      const dpr = window.devicePixelRatio || 1;
+      const rect = canvas.parentElement.getBoundingClientRect();
+      canvas.width = rect.width * dpr;
+      canvas.height = 200 * dpr;
+      ctx.scale(dpr, dpr);
+      canvas.style.width = rect.width + 'px';
+      canvas.style.height = '200px';
+      ctx.clearRect(0, 0, rect.width, 200);
+      ctx.fillStyle = '#8a8a9a';
+      ctx.font = '13px Inter, sans-serif';
+      ctx.textAlign = 'center';
+      ctx.fillText('Need at least 2 sessions to show trend', rect.width / 2, 100);
     }
 
-    App.openModal('modal-history');
+    // Build list
+    const unit = Settings.getSettings().unit;
+    let listHtml = '';
+    all.forEach(w => {
+      const vol = (w.sets || 0) * (w.reps || 0) * (w.weight || 0);
+      listHtml += `
+        <div class="data-item">
+          <div class="data-item-icon" style="background:rgba(255,255,255,0.05)">📅</div>
+          <div class="data-item-info">
+            <div class="data-item-name">${Storage.formatDate(w.date)}</div>
+            <div class="data-item-meta">${w.sets}×${w.reps} @ ${w.weight || 0}${unit} ${w.notes ? `— ${w.notes}` : ''}</div>
+          </div>
+          ${vol > 0 ? `<div class="data-item-value">${vol.toLocaleString()} ${unit}</div>` : ''}
+        </div>
+      `;
+    });
+    document.getElementById('exercise-history-list').innerHTML = listHtml;
+
+    App.openModal('modal-exercise-history');
   }
 
   function init() {
@@ -289,11 +351,12 @@ const Workouts = (() => {
     
     const btnAddRoutine = document.getElementById('btn-add-routine');
     if (btnAddRoutine) btnAddRoutine.addEventListener('click', () => App.openModal('modal-routine'));
-    
-    if (typeof Timer !== 'undefined') Timer.updateSessionUI();
+
+    const btnSession = document.getElementById('btn-session-toggle');
+    if (btnSession) btnSession.addEventListener('click', toggleSession);
     
     initPresetSync();
   }
 
-  return { render, renderTemplates, init, remove, edit, logRoutine, deleteRoutine, showHistory };
+  return { render, renderTemplates, init, remove, edit, logRoutine, deleteRoutine, showHistory, toggleSession };
 })();

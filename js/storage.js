@@ -5,6 +5,7 @@ const Storage = (() => {
     food: 'gk_food',
     weight: 'gk_weight',
     templates: 'gk_templates',
+    measurements: 'gk_measurements',
     water: 'gk_water',
     sessions: 'gk_sessions',
   };
@@ -130,66 +131,64 @@ const Storage = (() => {
     };
   }
 
-  // ===== WEIGHT / MEASUREMENTS =====
+  // ===== WEIGHT =====
   function getWeightLog() { return _get(KEYS.weight); }
-  function addMeasurement(data) {
+  function addWeight(kg) {
     const all = getWeightLog();
     const today = todayStr();
     const idx = all.findIndex(w => w.date === today);
-    const entry = { ...data, date: today, timestamp: Date.now() };
-    if (entry.weight !== undefined) entry.kg = entry.weight;
-    
-    if (idx >= 0) {
-      all[idx] = { ...all[idx], ...entry };
-    } else {
-      all.push(entry);
-    }
+    if (idx >= 0) { all[idx].kg = kg; }
+    else { all.push({ date: today, kg, timestamp: Date.now() }); }
     all.sort((a, b) => a.date.localeCompare(b.date));
     _set(KEYS.weight, all);
   }
   function getLatestWeight() {
     const all = getWeightLog();
-    if (!all.length) return null;
-    const latest = all[all.length - 1];
-    return latest.weight || latest.kg || null;
-  }
-  function getLatestMeasurement() {
-    const all = getWeightLog();
-    return all.length ? all[all.length - 1] : null;
+    return all.length ? all[all.length - 1].kg : null;
   }
 
-  // ===== WATER TRACKER =====
-  function getWaterLog() { return _get(KEYS.water); }
-  function addWater(amount, ds) {
-    const all = getWaterLog();
-    const date = ds || todayStr();
-    const idx = all.findIndex(w => w.date === date);
-    if (idx >= 0) {
-      all[idx].amount = (all[idx].amount || 0) + amount;
-    } else {
-      all.push({ date, amount, timestamp: Date.now() });
-    }
-    _set(KEYS.water, all);
+  // ===== BODY MEASUREMENTS =====
+  function getMeasurements() { return _get(KEYS.measurements); }
+  function addMeasurement(m) {
+    const all = getMeasurements();
+    m.date = m.date || todayStr();
+    m.timestamp = Date.now();
+    const idx = all.findIndex(x => x.date === m.date);
+    if (idx >= 0) { all[idx] = { ...all[idx], ...m }; }
+    else { all.push(m); }
+    all.sort((a, b) => a.date.localeCompare(b.date));
+    _set(KEYS.measurements, all);
   }
+
+  // ===== WATER INTAKE =====
+  function getWaterLog() { return _get(KEYS.water); }
   function getWaterByDate(ds) {
     const all = getWaterLog();
-    const entry = all.find(w => w.date === (ds || todayStr()));
-    return entry ? entry.amount : 0;
+    const d = ds || todayStr();
+    const entry = all.find(w => w.date === d);
+    return entry ? entry.ml : 0;
+  }
+  function addWater(ml, ds) {
+    const all = getWaterLog();
+    const d = ds || todayStr();
+    const idx = all.findIndex(w => w.date === d);
+    if (idx >= 0) { all[idx].ml += ml; }
+    else { all.push({ date: d, ml }); }
+    _set(KEYS.water, all);
+    return getWaterByDate(d);
   }
 
   // ===== WORKOUT SESSIONS =====
   function getSessions() { return _get(KEYS.sessions); }
-  function addSession(session) {
+  function addSession(s) {
     const all = getSessions();
-    session.id = Date.now().toString(36);
-    session.timestamp = Date.now();
-    all.push(session);
+    s.date = s.date || todayStr();
+    all.unshift(s);
     _set(KEYS.sessions, all);
-    return session;
   }
-  function getLatestSession() {
+  function getLastSession() {
     const all = getSessions();
-    return all.length ? all[all.length - 1] : null;
+    return all.length ? all[0] : null;
   }
 
   // ===== STATS =====
@@ -233,9 +232,9 @@ const Storage = (() => {
     getTemplates, addTemplate, deleteTemplate,
     getFood, addFood, deleteFood, getFoodByDate, getDailyNutrition,
     getWeightLog, addWeight, getLatestWeight,
+    getMeasurements, addMeasurement,
+    getWaterLog, getWaterByDate, addWater,
+    getSessions, addSession, getLastSession,
     getStreak, getPersonalRecords, getTotalVolume, getTotalWorkouts,
-    addMeasurement, getLatestMeasurement,
-    getWaterLog, addWater, getWaterByDate,
-    getSessions, addSession, getLatestSession,
   };
 })();

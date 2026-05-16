@@ -25,6 +25,15 @@ const Dashboard = (() => {
     const todayNutrition = Storage.getDailyNutrition();
     const streak = Storage.getStreak();
     const totalVol = todayWorkouts.reduce((s, w) => s + (w.sets || 0) * (w.reps || 0) * (w.weight || 0), 0);
+    const lastSession = Storage.getLastSession();
+    const waterMl = Storage.getWaterByDate();
+
+    function fmtDur(ms) {
+      if (!ms) return '--';
+      const s = Math.floor(ms / 1000);
+      const m = Math.floor(s / 60);
+      return m + ' min';
+    }
 
     const statsHTML = `
       <div class="stat-card purple">
@@ -52,15 +61,15 @@ const Dashboard = (() => {
         </div>
         <div class="stat-card-label">Day Streak</div>
       </div>
-      <div class="stat-card purple" style="background: linear-gradient(135deg, #2196F3, #64B5F6);">
-        <div class="stat-card-icon">💧</div>
-        <div class="stat-card-value">${Storage.getWaterByDate()} ml</div>
-        <div class="stat-card-label">Water Today</div>
-      </div>
-      <div class="stat-card cyan" style="background: linear-gradient(135deg, #4CAF50, #81C784);">
+      <div class="stat-card">
         <div class="stat-card-icon">⏱️</div>
-        <div class="stat-card-value">${Storage.getLatestSession() ? Storage.getLatestSession().duration + 'm' : '—'}</div>
-        <div class="stat-card-label">Last Workout</div>
+        <div class="stat-card-value">${fmtDur(lastSession ? lastSession.duration : 0)}</div>
+        <div class="stat-card-label">Last Session</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-card-icon">💧</div>
+        <div class="stat-card-value">${waterMl >= 1000 ? (waterMl / 1000).toFixed(1) + 'L' : waterMl + 'ml'}</div>
+        <div class="stat-card-label">Water Today</div>
       </div>
     `;
     document.getElementById('dashboard-stats').innerHTML = statsHTML;

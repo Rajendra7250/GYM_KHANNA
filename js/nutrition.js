@@ -18,10 +18,12 @@ const Nutrition = (() => {
 
   function render() {
     updateDateLabel();
-    renderWater();
     const ds = getDateStr();
     const nutrition = Storage.getDailyNutrition(ds);
     const foods = Storage.getFoodByDate(ds);
+
+    // Water intake
+    renderWater(ds);
 
     // Nutrition stats
     const statsEl = document.getElementById('nutrition-stats');
@@ -182,30 +184,6 @@ const Nutrition = (() => {
     App.openModal('modal-food');
   }
 
-  function renderWater() {
-    const ds = getDateStr();
-    const amount = Storage.getWaterByDate(ds);
-    const target = 3000; // default 3L
-    const fill = Math.min((amount / target) * 100, 100);
-    
-    const fillEl = document.getElementById('water-fill');
-    const currentEl = document.getElementById('water-current');
-    const targetEl = document.getElementById('water-target');
-    
-    if (fillEl) fillEl.style.height = `${fill}%`;
-    if (currentEl) currentEl.textContent = amount;
-    if (targetEl) targetEl.textContent = target;
-  }
-
-  function addWater(amount) {
-    const ds = getDateStr();
-    Storage.addWater(amount, ds);
-    renderWater();
-    if (Storage.isToday(ds)) {
-      Dashboard.render();
-    }
-  }
-
   function initPresetSync() {
     const preset = document.getElementById('food-preset');
     if (!preset) return;
@@ -245,7 +223,25 @@ const Nutrition = (() => {
     }
 
     initPresetSync();
+
+    // Water buttons
+    const btn250 = document.getElementById('btn-water-250');
+    const btn500 = document.getElementById('btn-water-500');
+    if (btn250) btn250.addEventListener('click', () => { Storage.addWater(250, getDateStr()); renderWater(getDateStr()); });
+    if (btn500) btn500.addEventListener('click', () => { Storage.addWater(500, getDateStr()); renderWater(getDateStr()); });
   }
 
-  return { render, init, remove, edit, addWater };
+  function renderWater(ds) {
+    const ml = Storage.getWaterByDate(ds);
+    const goal = 3000;
+    const pct = Math.min((ml / goal) * 100, 100);
+    const fillEl = document.getElementById('water-fill');
+    const amountEl = document.getElementById('water-amount');
+    const targetEl = document.getElementById('water-target');
+    if (fillEl) fillEl.style.height = pct + '%';
+    if (amountEl) amountEl.textContent = ml >= 1000 ? (ml / 1000).toFixed(1) + ' L' : ml + ' ml';
+    if (targetEl) targetEl.textContent = `Goal: ${(goal / 1000).toFixed(1)} L (${Math.round(pct)}%)`;
+  }
+
+  return { render, init, remove, edit };
 })();

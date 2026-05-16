@@ -1,8 +1,8 @@
 /* ===== Progress Page ===== */
 const Progress = (() => {
-  let activeMetric = 'weight';
 
   function render() {
+    // Stats
     const totalWorkouts = Storage.getTotalWorkouts();
     const totalVolume = Storage.getTotalVolume();
     const streak = Storage.getStreak();
@@ -35,42 +35,42 @@ const Progress = (() => {
       `;
     }
 
-    renderProgressChart();
+    // Weight chart
+    renderWeightChart();
+
+    // Body measurements chart
+    renderMeasurementsChart();
+
+    // Personal records
     renderPRs();
-    prefillInputs();
   }
 
-  function prefillInputs() {
-    const latest = Storage.getLatestMeasurement();
-    if (!latest) return;
-    const fields = ['weight', 'bodyFat', 'chest', 'waist', 'biceps', 'thighs'];
-    fields.forEach(f => {
-      const input = document.getElementById(`measure-${f}`);
-      if (input && latest[f]) input.value = latest[f];
-    });
-  }
-
-  function renderProgressChart() {
-    const log = Storage.getWeightLog();
-    const canvas = document.getElementById('chart-progress');
+  function renderWeightChart() {
+    const weightLog = Storage.getWeightLog();
+    const canvas = document.getElementById('chart-weight');
     if (!canvas) return;
 
-    if (!log.length) {
-      Charts.drawEmptyState(canvas, 'Log your metrics to see trend charts');
+    if (!weightLog.length) {
+      const ctx = canvas.getContext('2d');
+      const dpr = window.devicePixelRatio || 1;
+      const rect = canvas.parentElement.getBoundingClientRect();
+      canvas.width = rect.width * dpr;
+      canvas.height = 200 * dpr;
+      ctx.scale(dpr, dpr);
+      canvas.style.width = rect.width + 'px';
+      canvas.style.height = '200px';
+      ctx.clearRect(0, 0, rect.width, 200);
+      ctx.fillStyle = '#8a8a9a';
+      ctx.font = '13px Inter, sans-serif';
+      ctx.textAlign = 'center';
+      ctx.fillText('Log your weight to see the trend chart', rect.width / 2, 100);
       return;
     }
 
-    const data = log.filter(entry => entry[activeMetric] !== undefined || (activeMetric === 'weight' && entry.kg !== undefined))
-      .map(entry => ({
-        label: Storage.formatDate(entry.date),
-        value: entry[activeMetric] || entry.kg,
-      }));
-
-    if (!data.length) {
-      Charts.drawEmptyState(canvas, `No data for ${activeMetric} yet`);
-      return;
-    }
-
+    const data = weightLog.map(w => ({
+      label: Storage.formatDate(w.date),
+      value: w.kg,
+    }));
     Charts.drawLineChart(canvas, data);
   }
 
@@ -103,43 +103,101 @@ const Progress = (() => {
     grid.innerHTML = html;
   }
 
-  function handleLogMeasurements() {
-    const data = {
-      weight: parseFloat(document.getElementById('measure-weight').value),
-      bodyFat: parseFloat(document.getElementById('measure-bodyFat').value),
-      chest: parseFloat(document.getElementById('measure-chest').value),
-      waist: parseFloat(document.getElementById('measure-waist').value),
-      biceps: parseFloat(document.getElementById('measure-biceps').value),
-      thighs: parseFloat(document.getElementById('measure-thighs').value),
-    };
-
-    // Remove undefined/NaN values
-    Object.keys(data).forEach(key => {
-      if (isNaN(data[key])) delete data[key];
-    });
-
-    if (Object.keys(data).length === 0) {
-      App.toast('Please enter at least one measurement');
+  function handleLogWeight() {
+    const input = document.getElementById('weight-input');
+    const val = parseFloat(input.value);
+    if (!val || val <= 0) {
+      App.toast('Please enter a valid weight');
       return;
     }
-
-    Storage.addMeasurement(data);
-    App.toast('Measurements updated! 📊', 'success');
+    Storage.addWeight(val);
+    input.value = '';
+    App.toast('Weight logged! ⚖️', 'success');
     render();
     Dashboard.render();
   }
 
-  function init() {
-    const btn = document.getElementById('btn-log-measurements');
-    if (btn) btn.addEventListener('click', handleLogMeasurements);
+  // ===== BODY MEASUREMENTS =====
+  function renderMeasurementsChart() {
+    const canvas = document.getElementById('chart-measurements');
+    if (!canvas) return;
+    const metric = document.getElementById('meas-metric-select');
+    const key = metric ? metric.value : 'bodyfat';
+    const labels = { bodyfat: 'Body Fat %', chest: 'Chest (cm)', waist: 'Waist (cm)', biceps: 'Biceps (cm)', thighs: 'Thighs (cm)' };
 
-    const selector = document.getElementById('metric-selector');
-    if (selector) {
-      selector.addEventListener('change', (e) => {
-        activeMetric = e.target.value;
-        renderProgressChart();
+    const all = Storage.getMeasurements();
+    const filtered = all.filter(m => m[key] != null && m[key] > 0);
+
+    if (!filtered.length) {
+      const ctx = canvas.getContext('2d');
+      const dpr = window.devicePixelRatio || 1;
+      const rect = canvas.parentElement.getBoundingClientRect();
+      canvas.width = rect.width * dpr;
+      canvas.height = 200 * dpr;
+      ctx.scale(dpr, dpr);
+      canvas.style.width = rect.width + 'px';
+      canvas.style.height = '200px';
+      ctx.clearRect(0, 0, rect.width, 200);
+      ctx.fillStyle = '#8a8a9a';
+      ctx.font = '13px Inter, sans-serif';
+      ctx.textAlign = 'center';
+      ctx.fillText(`Log measurements to see ${labels[key]} trend`, rect.width / 2, 100);
+      return;
+    }
+
+    const data = filtered.map(m => ({
+      label: Storage.formatDate(m.date),
+      value: m[key],
+    }));
+    Charts.drawLineChart(canvas, data);
+  }
+
+  function handleSaveMeasurements() {
+    const m = {
+      bodyfat: parseFloat(document.getElementById('meas-bodyfat').value) || null,
+      chest: parseFloat(document.getElementById('meas-chest').value) || null,
+      waist: parseFloat(document.getElementById('meas-waist').value) || null,
+      biceps: parseFloat(document.getElementById('meas-biceps').value) || null,
+      thighs: parseFloat(document.getElementById('meas-thighs').value) || null,
+    };
+    if (!m.bodyfat && !m.chest && !m.waist && !m.biceps && !m.thighs) {
+      App.toast('Enter at least one measurement');
+      return;
+    }
+    Storage.addMeasurement(m);
+    App.toast('Measurements saved! 📏', 'success');
+    document.getElementById('measurements-form').style.display = 'none';
+    render();
+  }
+
+  function init() {
+    const btn = document.getElementById('btn-log-weight');
+    if (btn) btn.addEventListener('click', handleLogWeight);
+
+    const input = document.getElementById('weight-input');
+    if (input) {
+      input.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') {
+          e.preventDefault();
+          handleLogWeight();
+        }
       });
     }
+
+    // Measurements form toggle
+    const btnMeas = document.getElementById('btn-log-measurements');
+    if (btnMeas) {
+      btnMeas.addEventListener('click', () => {
+        const form = document.getElementById('measurements-form');
+        form.style.display = form.style.display === 'none' ? 'block' : 'none';
+      });
+    }
+
+    const btnSaveMeas = document.getElementById('btn-save-measurements');
+    if (btnSaveMeas) btnSaveMeas.addEventListener('click', handleSaveMeasurements);
+
+    const metricSel = document.getElementById('meas-metric-select');
+    if (metricSel) metricSel.addEventListener('change', () => renderMeasurementsChart());
   }
 
   return { render, init };

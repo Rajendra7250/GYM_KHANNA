@@ -4,10 +4,6 @@ const Timer = (() => {
   let remaining = 0;
   let active = false;
 
-  let sessionActive = false;
-  let sessionStartTime = null;
-  let sessionInterval = null;
-
   function init() {
     const html = `
       <div id="rest-timer" class="rest-timer hidden">
@@ -27,83 +23,6 @@ const Timer = (() => {
     document.getElementById('timer-plus').addEventListener('click', () => addTime(30));
     document.getElementById('timer-skip').addEventListener('click', stop);
     document.getElementById('timer-close').addEventListener('click', stop);
-
-    // Session Timer Hook
-    const btn = document.getElementById('btn-session-toggle');
-    if (btn) btn.addEventListener('click', toggleSession);
-
-    // Restore session if active
-    const saved = localStorage.getItem('gk_active_session');
-    if (saved) {
-      sessionStartTime = parseInt(saved);
-      startSessionLoop();
-    }
-  }
-
-  function toggleSession() {
-    if (sessionActive) {
-      stopSession();
-    } else {
-      startSession();
-    }
-  }
-
-  function startSession() {
-    sessionStartTime = Date.now();
-    localStorage.setItem('gk_active_session', sessionStartTime);
-    startSessionLoop();
-    App.toast("Workout session started! Let's go! 🔥", "success");
-  }
-
-  function startSessionLoop() {
-    sessionActive = true;
-    updateSessionUI();
-    sessionInterval = setInterval(updateSessionClock, 1000);
-    updateSessionClock();
-  }
-
-  function stopSession() {
-    const durationMs = Date.now() - sessionStartTime;
-    const durationMins = Math.round(durationMs / 60000);
-    
-    Storage.addSession({
-      startTime: sessionStartTime,
-      endTime: Date.now(),
-      duration: durationMins
-    });
-
-    clearInterval(sessionInterval);
-    sessionActive = false;
-    sessionStartTime = null;
-    localStorage.removeItem('gk_active_session');
-    
-    updateSessionUI();
-    App.toast(`Workout ended! Duration: ${durationMins} mins. Great work! 👊`, "success");
-    if (typeof Workouts !== 'undefined') Workouts.render();
-    if (typeof Dashboard !== 'undefined') Dashboard.render();
-  }
-
-  function updateSessionClock() {
-    const clock = document.getElementById('session-clock');
-    if (!clock) return;
-    
-    const diff = Date.now() - sessionStartTime;
-    const h = Math.floor(diff / 3600000).toString().padStart(2, '0');
-    const m = Math.floor((diff % 3600000) / 60000).toString().padStart(2, '0');
-    const s = Math.floor((diff % 60000) / 1000).toString().padStart(2, '0');
-    clock.textContent = `${h}:${m}:${s}`;
-  }
-
-  function updateSessionUI() {
-    const btn = document.getElementById('btn-session-toggle');
-    const clock = document.getElementById('session-clock');
-    if (btn) {
-      btn.textContent = sessionActive ? 'End Workout' : 'Start Workout';
-      btn.className = sessionActive ? 'btn btn-ghost' : 'btn btn-primary';
-    }
-    if (clock) {
-      clock.style.display = sessionActive ? 'block' : 'none';
-    }
   }
 
   function start(seconds = 90) {
@@ -168,5 +87,5 @@ const Timer = (() => {
     el.textContent = `${m}:${s}`;
   }
 
-  return { init, start, stop, updateSessionUI };
+  return { init, start, stop };
 })();

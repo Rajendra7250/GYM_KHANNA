@@ -1,4 +1,4 @@
-const CACHE_NAME = 'gymkhanna-v3';
+const CACHE_NAME = 'gymkhanna-v4';
 const ASSETS = [
   './',
   './index.html',

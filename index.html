@@ -105,16 +105,23 @@
 
     <!-- ============ WORKOUTS PAGE ============ -->
     <section class="page" id="page-workouts">
-      <div class="page-header" style="display:flex; justify-content:space-between; align-items:flex-start;">
-        <div>
-          <h2>Workouts</h2>
-          <p>Track every set, rep, and PR</p>
-        </div>
-        <div id="session-timer-container" style="text-align:right;">
-          <div id="session-clock" style="font-family:monospace; font-size:1.2rem; color:var(--primary); font-weight:bold; display:none; margin-bottom:4px;">00:00:00</div>
-          <button class="btn btn-primary" id="btn-session-toggle">Start Workout</button>
-        </div>
+      <div class="page-header">
+        <h2>Workouts</h2>
+        <p>Track every set, rep, and PR</p>
       </div>
+
+      <!-- Workout Session Timer -->
+      <div class="card session-timer-card" id="session-timer-card" style="margin-bottom:var(--sp-lg); display:flex; align-items:center; justify-content:space-between; gap:var(--sp-md); padding:var(--sp-md) var(--sp-lg);">
+        <div style="display:flex; align-items:center; gap:var(--sp-md);">
+          <span style="font-size:1.3rem;">⏱️</span>
+          <div>
+            <div style="font-size:0.8rem; color:var(--text-secondary); text-transform:uppercase; letter-spacing:0.05em;">Session Duration</div>
+            <div style="font-size:1.4rem; font-weight:700; font-variant-numeric:tabular-nums;" id="session-clock">00:00:00</div>
+          </div>
+        </div>
+        <button class="btn btn-primary" id="btn-session-toggle">Start Workout</button>
+      </div>
+
       <div class="section-title">
         <h3>Templates & Routines</h3>
         <button class="btn btn-ghost" id="btn-add-routine">
@@ -155,20 +162,6 @@
         <div class="section-title"><h3>Macros</h3></div>
         <div class="macro-bars" id="macro-bars"></div>
       </div>
-
-      <div class="card" style="margin-bottom: var(--sp-lg); text-align: center;">
-        <div class="section-title"><h3>Water Intake</h3></div>
-        <div class="water-gauge-container">
-          <div class="water-gauge">
-            <div class="water-fill" id="water-fill"></div>
-            <div class="water-text"><span id="water-current">0</span> / <span id="water-target">3000</span> ml</div>
-          </div>
-        </div>
-        <div style="display:flex; justify-content:center; gap:var(--sp-md); margin-top:var(--sp-md);">
-          <button class="btn btn-ghost" onclick="Nutrition.addWater(250)">+ 250ml</button>
-          <button class="btn btn-ghost" onclick="Nutrition.addWater(500)">+ 500ml</button>
-        </div>
-      </div>
       <div class="section-title">
         <h3>Food Log</h3>
         <button class="btn btn-primary" id="btn-add-food">
@@ -177,6 +170,24 @@
         </button>
       </div>
       <div id="food-list"></div>
+
+      <!-- Water Intake Section -->
+      <div class="card" style="margin-top:var(--sp-xl);">
+        <div class="section-title"><h3>Water Intake 💧</h3></div>
+        <div id="water-gauge-container" style="display:flex; align-items:center; gap:var(--sp-lg); padding:var(--sp-md) 0;">
+          <div class="water-gauge" id="water-gauge" style="width:60px; height:120px; border-radius:var(--r-md); border:2px solid var(--border); position:relative; overflow:hidden; background:var(--bg-tertiary); flex-shrink:0;">
+            <div class="water-fill" id="water-fill" style="position:absolute; bottom:0; left:0; right:0; background:linear-gradient(180deg, #4fc3f7, #0288d1); transition:height 0.6s cubic-bezier(.4,0,.2,1); height:0%;"></div>
+          </div>
+          <div style="flex:1;">
+            <div style="font-size:1.5rem; font-weight:700;" id="water-amount">0 ml</div>
+            <div style="font-size:0.85rem; color:var(--text-secondary);" id="water-target">Goal: 3000 ml</div>
+            <div style="display:flex; gap:var(--sp-sm); margin-top:var(--sp-md);">
+              <button class="btn btn-primary" id="btn-water-250" style="flex:1;">+ 250ml</button>
+              <button class="btn btn-ghost" id="btn-water-500" style="flex:1;">+ 500ml</button>
+            </div>
+          </div>
+        </div>
+      </div>
     </section>
 
     <!-- ============ PROGRESS PAGE ============ -->
@@ -187,53 +198,50 @@
       </div>
       <div class="stat-cards" id="progress-stats"></div>
       <div class="card" style="margin-bottom: var(--sp-xl);">
+        <div class="section-title"><h3>Body Weight</h3></div>
+        <div class="weight-input-row">
+          <div class="form-group">
+            <label class="form-label">Weight (kg)</label>
+            <input type="number" class="form-input" id="weight-input" placeholder="e.g. 75" step="0.1">
+          </div>
+          <button class="btn btn-primary" id="btn-log-weight">Log</button>
+        </div>
+        <div class="chart-container"><canvas id="chart-weight" height="200"></canvas></div>
+      </div>
+
+      <!-- Body Measurements -->
+      <div class="card" style="margin-bottom: var(--sp-xl);">
         <div class="section-title">
-          <h3>Body Metrics</h3>
-          <select class="form-select" id="metric-selector" style="width:auto; margin:0;">
-            <option value="weight">Weight</option>
-            <option value="bodyFat">Body Fat %</option>
+          <h3>Body Measurements 📏</h3>
+          <button class="btn btn-ghost" id="btn-log-measurements">+ Log Today</button>
+        </div>
+        <div id="measurements-form" style="display:none;">
+          <div class="form-row">
+            <div class="form-group"><label class="form-label">Body Fat %</label><input type="number" class="form-input" id="meas-bodyfat" step="0.1" placeholder="e.g. 15"></div>
+            <div class="form-group"><label class="form-label">Chest (cm)</label><input type="number" class="form-input" id="meas-chest" step="0.1" placeholder="e.g. 100"></div>
+          </div>
+          <div class="form-row">
+            <div class="form-group"><label class="form-label">Waist (cm)</label><input type="number" class="form-input" id="meas-waist" step="0.1" placeholder="e.g. 80"></div>
+            <div class="form-group"><label class="form-label">Biceps (cm)</label><input type="number" class="form-input" id="meas-biceps" step="0.1" placeholder="e.g. 35"></div>
+          </div>
+          <div class="form-row">
+            <div class="form-group"><label class="form-label">Thighs (cm)</label><input type="number" class="form-input" id="meas-thighs" step="0.1" placeholder="e.g. 55"></div>
+            <div class="form-group"></div>
+          </div>
+          <button class="btn btn-primary" id="btn-save-measurements" style="margin-top:var(--sp-sm);">Save Measurements</button>
+        </div>
+        <div style="margin-bottom:var(--sp-sm);">
+          <select class="form-select" id="meas-metric-select" style="max-width:200px;">
+            <option value="bodyfat">Body Fat %</option>
             <option value="chest">Chest</option>
             <option value="waist">Waist</option>
             <option value="biceps">Biceps</option>
             <option value="thighs">Thighs</option>
           </select>
         </div>
-        <div class="chart-container"><canvas id="chart-progress" height="200"></canvas></div>
-        
-        <div style="margin-top: var(--sp-lg); border-top: 1px solid rgba(255,255,255,0.05); padding-top: var(--sp-lg);">
-          <div class="form-row">
-            <div class="form-group">
-              <label class="form-label">Weight (kg)</label>
-              <input type="number" class="form-input" id="measure-weight" placeholder="75" step="0.1">
-            </div>
-            <div class="form-group">
-              <label class="form-label">Body Fat %</label>
-              <input type="number" class="form-input" id="measure-bodyFat" placeholder="15" step="0.1">
-            </div>
-          </div>
-          <div class="form-row">
-            <div class="form-group">
-              <label class="form-label">Chest (cm)</label>
-              <input type="number" class="form-input" id="measure-chest" placeholder="100">
-            </div>
-            <div class="form-group">
-              <label class="form-label">Waist (cm)</label>
-              <input type="number" class="form-input" id="measure-waist" placeholder="80">
-            </div>
-          </div>
-          <div class="form-row">
-            <div class="form-group">
-              <label class="form-label">Biceps (cm)</label>
-              <input type="number" class="form-input" id="measure-biceps" placeholder="35">
-            </div>
-            <div class="form-group">
-              <label class="form-label">Thighs (cm)</label>
-              <input type="number" class="form-input" id="measure-thighs" placeholder="55">
-            </div>
-          </div>
-          <button class="btn btn-primary" id="btn-log-measurements" style="width:100%; margin-top:var(--sp-sm);">Update Measurements</button>
-        </div>
+        <div class="chart-container"><canvas id="chart-measurements" height="200"></canvas></div>
       </div>
+
       <div class="section-title"><h3>Personal Records 🏆</h3></div>
       <div class="pr-grid" id="pr-grid"></div>
     </section>
@@ -450,18 +458,14 @@
 </div>
 
 <!-- Exercise History Modal -->
-<div class="modal-overlay" id="modal-history">
-  <div class="modal" style="max-width: 600px;">
+<div class="modal-overlay" id="modal-exercise-history">
+  <div class="modal" style="max-width:600px;">
     <div class="modal-header">
-      <h3 id="history-title">Exercise History</h3>
-      <button class="modal-close" data-close="modal-history">✕</button>
+      <h3 id="exercise-history-title">Exercise History</h3>
+      <button class="modal-close" data-close="modal-exercise-history">✕</button>
     </div>
-    <div class="chart-container" style="margin-bottom: var(--sp-lg);">
-      <canvas id="chart-history" height="200"></canvas>
-    </div>
-    <div id="history-list" class="data-list" style="max-height: 300px; overflow-y: auto;">
-      <!-- History items injected here -->
-    </div>
+    <div class="chart-container" style="margin-bottom:var(--sp-lg);"><canvas id="chart-exercise-history" height="200"></canvas></div>
+    <div id="exercise-history-list" class="data-list"></div>
   </div>
 </div>
 
