@@ -77,6 +77,67 @@ const Dashboard = (() => {
     // Weekly chart
     const weekly = Storage.getWeeklyActivity();
     Charts.drawBarChart(document.getElementById('chart-weekly'), weekly);
+
+    // Heatmap
+    renderHeatmap();
+  }
+
+  function renderHeatmap() {
+    const container = document.getElementById('heatmap-container');
+    if (!container) return;
+
+    const workouts = Storage.getWorkouts();
+    const activity = {}; // ds -> count
+    workouts.forEach(w => {
+      activity[w.date] = (activity[w.date] || 0) + 1;
+    });
+
+    const today = new Date();
+    // 52 weeks ago
+    const startDate = new Date(today);
+    startDate.setDate(today.getDate() - (52 * 7));
+    // Back to Sunday
+    startDate.setDate(startDate.getDate() - startDate.getDay());
+
+    let html = '<div style="display:flex; gap:4px;">';
+    let current = new Date(startDate);
+    
+    // Fill weeks
+    const weeks = [];
+    let currentWeek = [];
+    while (current <= today) {
+      const ds = Storage.dateStr(current);
+      currentWeek.push({ date: ds, count: activity[ds] || 0 });
+      if (currentWeek.length === 7) {
+        weeks.push(currentWeek);
+        currentWeek = [];
+      }
+      current.setDate(current.getDate() + 1);
+    }
+    if (currentWeek.length > 0) weeks.push(currentWeek);
+
+    weeks.forEach(week => {
+      html += '<div style="display:flex; flex-direction:column; gap:4px;">';
+      week.forEach(day => {
+        let intensity = 0;
+        if (day.count > 0) intensity = 1;
+        if (day.count > 2) intensity = 2;
+        if (day.count > 4) intensity = 3;
+        if (day.count > 6) intensity = 4;
+        
+        const color = intensity === 0 ? 'rgba(255,255,255,0.05)' :
+                      intensity === 1 ? 'rgba(136,136,146, 0.4)' :
+                      intensity === 2 ? 'rgba(136,136,146, 0.7)' :
+                      intensity === 3 ? 'rgba(234,234,234, 0.7)' :
+                      '#eaeaea';
+        
+        html += `<div class="heatmap-box" style="width:14px; height:14px; border-radius:3px; background:${color}; transition:transform 0.2s, opacity 0.2s; cursor:pointer;" title="${Storage.formatDate(day.date)}: ${day.count} exercises"></div>`;
+      });
+      html += '</div>';
+    });
+    
+    html += '</div>';
+    container.innerHTML = html;
   }
 
   return { render };
