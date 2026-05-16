@@ -5,6 +5,14 @@ const Settings = (() => {
     unit: 'kg', theme: 'dark'
   };
 
+  function applyTheme(theme) {
+    document.documentElement.setAttribute('data-theme', theme);
+    const meta = document.querySelector('meta[name="theme-color"]');
+    if (meta) meta.content = theme === 'light' ? '#f4f4f8' : '#a855f7';
+    const toggle = document.getElementById('theme-toggle');
+    if (toggle) toggle.checked = theme === 'light';
+  }
+
   function getSettings() {
     try {
       return { ...DEFAULT, ...JSON.parse(localStorage.getItem('gk_settings')) };
@@ -26,6 +34,7 @@ const Settings = (() => {
     if (fEl) fEl.value = s.fat;
     const uEl = document.getElementById('set-unit');
     if (uEl) uEl.value = s.unit;
+    applyTheme(s.theme || 'dark');
   }
 
   function handleSave(e) {
@@ -35,7 +44,7 @@ const Settings = (() => {
       carbs: parseInt(document.getElementById('set-carbs').value) || 250,
       fat: parseInt(document.getElementById('set-fat').value) || 65,
       unit: document.getElementById('set-unit').value,
-      theme: 'dark'
+      theme: getSettings().theme || 'dark'
     };
     saveSettings(s);
     App.toast("Settings saved!", "success");
@@ -93,7 +102,21 @@ const Settings = (() => {
     
     const fileImp = document.getElementById('file-import');
     if (fileImp) fileImp.addEventListener('change', importData);
-    
+
+    // Theme toggle
+    const themeToggle = document.getElementById('theme-toggle');
+    if (themeToggle) {
+      themeToggle.addEventListener('change', () => {
+        const theme = themeToggle.checked ? 'light' : 'dark';
+        const s = getSettings();
+        s.theme = theme;
+        saveSettings(s);
+        applyTheme(theme);
+      });
+    }
+
+    // Apply saved theme immediately
+    applyTheme(getSettings().theme || 'dark');
     render();
   }
 

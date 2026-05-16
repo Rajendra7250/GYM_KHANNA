@@ -1,8 +1,7 @@
 /* ===== GymKhanna Design System ===== */
 @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=Inter:wght@300;400;500;600&display=swap');
 
-:root {
-  /* Colors */
+:root, [data-theme="dark"] {
   --bg-primary: #0a0a0f;
   --bg-secondary: #12121a;
   --bg-card: rgba(255,255,255,0.04);
@@ -23,15 +22,56 @@
   --success: #22c55e;
   --danger: #ef4444;
   --warning: #eab308;
-  /* Spacing */
   --sp-xs: 4px; --sp-sm: 8px; --sp-md: 16px; --sp-lg: 24px; --sp-xl: 32px; --sp-2xl: 48px;
-  /* Radius */
   --r-sm: 8px; --r-md: 12px; --r-lg: 16px; --r-xl: 20px; --r-full: 9999px;
-  /* Shadows */
   --shadow-glow: 0 0 30px rgba(168,85,247,0.15);
   --shadow-card: 0 4px 24px rgba(0,0,0,0.3);
   --shadow-lg: 0 8px 40px rgba(0,0,0,0.4);
 }
+
+[data-theme="light"] {
+  --bg-primary: #f4f4f8;
+  --bg-secondary: #ffffff;
+  --bg-card: rgba(0,0,0,0.03);
+  --bg-card-hover: rgba(0,0,0,0.06);
+  --bg-glass: rgba(0,0,0,0.04);
+  --border-glass: rgba(0,0,0,0.1);
+  --text-primary: #1a1a2e;
+  --text-secondary: #6b6b80;
+  --text-muted: #9a9ab0;
+  --shadow-glow: 0 0 30px rgba(168,85,247,0.1);
+  --shadow-card: 0 4px 24px rgba(0,0,0,0.08);
+  --shadow-lg: 0 8px 40px rgba(0,0,0,0.12);
+}
+[data-theme="light"] .bg-ambience::before { background: radial-gradient(circle, rgba(168,85,247,0.06) 0%, transparent 70%); }
+[data-theme="light"] .bg-ambience::after { background: radial-gradient(circle, rgba(236,72,153,0.05) 0%, transparent 70%); }
+[data-theme="light"] .bottom-nav { background: rgba(255,255,255,0.92); }
+[data-theme="light"] .toast { background: var(--bg-secondary); box-shadow: var(--shadow-card); }
+[data-theme="light"] .rest-timer { background: var(--bg-secondary); box-shadow: var(--shadow-lg); }
+[data-theme="light"] .form-select option { background: #fff; color: #1a1a2e; }
+
+/* ===== Theme Toggle Switch ===== */
+.theme-toggle-row {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: var(--sp-md); background: var(--bg-card); border: 1px solid var(--border-glass);
+  border-radius: var(--r-md); margin-bottom: var(--sp-md);
+}
+.theme-toggle-row .theme-label { font-size: 0.85rem; font-weight: 600; display: flex; align-items: center; gap: var(--sp-sm); }
+.theme-switch {
+  position: relative; width: 52px; height: 28px; cursor: pointer;
+}
+.theme-switch input { opacity: 0; width: 0; height: 0; }
+.theme-switch .slider {
+  position: absolute; inset: 0; background: var(--bg-card-hover); border: 1px solid var(--border-glass);
+  border-radius: var(--r-full); transition: all 0.35s cubic-bezier(.4,0,.2,1);
+}
+.theme-switch .slider::before {
+  content: ''; position: absolute; width: 20px; height: 20px; left: 3px; top: 3px;
+  background: var(--text-primary); border-radius: 50%;
+  transition: transform 0.35s cubic-bezier(.4,0,.2,1);
+}
+.theme-switch input:checked + .slider { background: var(--accent-1); border-color: var(--accent-1); }
+.theme-switch input:checked + .slider::before { transform: translateX(24px); background: #fff; }
 
 *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
 
