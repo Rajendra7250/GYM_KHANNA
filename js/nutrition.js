@@ -16,6 +16,69 @@ const Nutrition = (() => {
     }
   }
 
+  // ===== BARCODE SCANNER =====
+  let html5QrcodeScanner = null;
+
+  async function fetchProductByBarcode(barcode) {
+    try {
+      App.toast('Searching OpenFoodFacts...', 'success');
+      const res = await fetch(`https://world.openfoodfacts.org/api/v0/product/${barcode}.json`);
+      const data = await res.json();
+      if (data && data.status === 1) {
+        const p = data.product;
+        const name = p.product_name || 'Unknown Product';
+        const nutriments = p.nutriments || {};
+        
+        document.getElementById('food-name').value = name;
+        document.getElementById('food-calories').value = Math.round(nutriments['energy-kcal_100g'] || nutriments['energy-kcal'] || 0);
+        document.getElementById('food-protein').value = Math.round(nutriments.proteins_100g || nutriments.proteins || 0);
+        document.getElementById('food-carbs').value = Math.round(nutriments.carbohydrates_100g || nutriments.carbohydrates || 0);
+        document.getElementById('food-fat').value = Math.round(nutriments.fat_100g || nutriments.fat || 0);
+        
+        App.toast('Product found and auto-filled! ✅', 'success');
+        stopScanner();
+      } else {
+        App.toast('Product not found in database', 'error');
+      }
+    } catch (err) {
+      console.error(err);
+      App.toast('Error fetching product info', 'error');
+    }
+  }
+
+  function startScanner() {
+    if (!window.Html5QrcodeScanner) {
+      App.toast('Scanner library still loading...', 'error');
+      return;
+    }
+    
+    const container = document.getElementById('barcode-scanner-container');
+    container.style.display = 'block';
+
+    if (!html5QrcodeScanner) {
+      html5QrcodeScanner = new Html5QrcodeScanner(
+        "barcode-scanner-container", 
+        { fps: 10, qrbox: { width: 250, height: 150 } },
+        false
+      );
+    }
+    
+    html5QrcodeScanner.render((decodedText) => {
+      fetchProductByBarcode(decodedText);
+      stopScanner();
+    }, (error) => {
+      // ignore
+    });
+  }
+
+  function stopScanner() {
+    if (html5QrcodeScanner) {
+      html5QrcodeScanner.clear().catch(e => console.error(e));
+    }
+    const container = document.getElementById('barcode-scanner-container');
+    if (container) container.style.display = 'none';
+  }
+
   function render() {
     updateDateLabel();
     const ds = getDateStr();
@@ -223,6 +286,25 @@ const Nutrition = (() => {
     }
 
     initPresetSync();
+
+    // Barcode Scanner logic
+    const scanBtn = document.getElementById('btn-scan-barcode');
+    if (scanBtn) {
+      scanBtn.addEventListener('click', () => {
+        const container = document.getElementById('barcode-scanner-container');
+        if (container.style.display === 'block') {
+          stopScanner();
+        } else {
+          startScanner();
+        }
+      });
+    }
+
+    // Modal close should also stop scanner
+    const modalCloseBtn = document.querySelector('[data-close="modal-food"]');
+    if (modalCloseBtn) {
+      modalCloseBtn.addEventListener('click', stopScanner);
+    }
 
     // Water buttons
     const btn250 = document.getElementById('btn-water-250');

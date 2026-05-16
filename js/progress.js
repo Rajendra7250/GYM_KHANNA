@@ -43,6 +43,9 @@ const Progress = (() => {
 
     // Personal records
     renderPRs();
+
+    // Progress Photos
+    renderPhotos();
   }
 
   function renderWeightChart() {
@@ -91,12 +94,15 @@ const Progress = (() => {
 
     let html = '';
     const unit = Settings.getSettings().unit;
-    prs.forEach(pr => {
+    prs.forEach((pr, i) => {
       html += `
-        <div class="pr-card">
+        <div class="pr-card" id="pr-card-${i}" style="position:relative;">
           <div class="pr-card-lift">${pr.exercise}</div>
           <div class="pr-card-value">${pr.weight}</div>
           <div class="pr-card-unit">${unit} × ${pr.reps} reps</div>
+          <button class="btn-icon" style="position:absolute; top:8px; right:8px; background:rgba(255,255,255,0.1); border-radius:50%; padding:6px;" onclick="Progress.sharePR('pr-card-${i}', '${pr.exercise}')" title="Share PR">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg>
+          </button>
         </div>
       `;
     });
@@ -171,6 +177,145 @@ const Progress = (() => {
     render();
   }
 
+  // ===== PROGRESS PHOTOS =====
+  function renderPhotos() {
+    const photos = Storage.getPhotos();
+    const container = document.getElementById('photo-comparison-container');
+    const emptyState = document.getElementById('photo-empty');
+    if (!container || !emptyState) return;
+
+    if (photos.length === 0) {
+      container.style.display = 'none';
+      emptyState.style.display = 'flex';
+      return;
+    }
+
+    container.style.display = 'block';
+    emptyState.style.display = 'none';
+
+    // Populate selects
+    const selBefore = document.getElementById('photo-select-before');
+    const selAfter = document.getElementById('photo-select-after');
+    
+    let html = '';
+    photos.forEach(p => {
+      html += `<option value="${p.id}">${Storage.formatDate(p.date)}</option>`;
+    });
+    
+    // Remember previous selection or default
+    const prevB = selBefore.value;
+    const prevA = selAfter.value;
+    
+    selBefore.innerHTML = html;
+    selAfter.innerHTML = html;
+
+    if (photos.length > 1) {
+      // Default: oldest for before, newest for after
+      selBefore.value = prevB || photos[photos.length - 1].id;
+      selAfter.value = prevA || photos[0].id;
+    }
+
+    updatePhotoSlider();
+  }
+
+  function updatePhotoSlider() {
+    const photos = Storage.getPhotos();
+    const idB = document.getElementById('photo-select-before').value;
+    const idA = document.getElementById('photo-select-after').value;
+    
+    const pB = photos.find(p => p.id === idB);
+    const pA = photos.find(p => p.id === idA);
+    
+    if (pB) document.getElementById('photo-img-before').src = pB.data;
+    if (pA) document.getElementById('photo-img-after').src = pA.data;
+  }
+
+  function handlePhotoUpload(e) {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    // Compress using Canvas
+    const reader = new FileReader();
+    reader.onload = (ev) => {
+      const img = new Image();
+      img.onload = () => {
+        const canvas = document.createElement('canvas');
+        let width = img.width;
+        let height = img.height;
+        const maxDim = 800; // Limit size to 800px max dimension
+
+        if (width > height && width > maxDim) {
+          height *= maxDim / width;
+          width = maxDim;
+        } else if (height > maxDim) {
+          width *= maxDim / height;
+          height = maxDim;
+        }
+
+        canvas.width = width;
+        canvas.height = height;
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(img, 0, 0, width, height);
+        
+        // Export as WebP for smaller size
+        const base64 = canvas.toDataURL('image/webp', 0.8);
+        Storage.addPhoto(base64);
+        App.toast('Progress photo saved!', 'success');
+        renderPhotos();
+      };
+      img.src = ev.target.result;
+    };
+    reader.readAsDataURL(file);
+    e.target.value = ''; // Reset
+  }
+
+  // ===== SOCIAL SHARING =====
+  async function sharePR(cardId, exerciseName) {
+    if (!window.html2canvas) {
+      App.toast('Please wait, sharing module is loading...', 'error');
+      return;
+    }
+    
+    const element = document.getElementById(cardId);
+    // Hide the share button briefly for the screenshot
+    const btn = element.querySelector('button');
+    btn.style.display = 'none';
+    
+    try {
+      const canvas = await html2canvas(element, { backgroundColor: '#1e1e24' });
+      btn.style.display = 'block'; // Restore button
+      
+      canvas.toBlob(async (blob) => {
+        const file = new File([blob], `pr-${exerciseName.replace(/ /g, '-')}.png`, { type: 'image/png' });
+        
+        if (navigator.canShare && navigator.canShare({ files: [file] })) {
+          try {
+            await navigator.share({
+              title: `New PR for ${exerciseName}!`,
+              text: `Just hit a new PR for ${exerciseName} on GymKhanna! 💪`,
+              files: [file]
+            });
+          } catch (err) {
+            console.log('User canceled share', err);
+          }
+        } else {
+          // Fallback: download the image
+          const url = URL.createObjectURL(blob);
+          const a = document.createElement('a');
+          a.href = url;
+          a.download = file.name;
+          a.click();
+          URL.revokeObjectURL(url);
+          App.toast('Image downloaded! (Web Share API not supported)');
+        }
+      });
+    } catch (err) {
+      btn.style.display = 'block';
+      App.toast('Failed to generate image', 'error');
+      console.error(err);
+    }
+  }
+
   function init() {
     const btn = document.getElementById('btn-log-weight');
     if (btn) btn.addEventListener('click', handleLogWeight);
@@ -199,7 +344,24 @@ const Progress = (() => {
 
     const metricSel = document.getElementById('meas-metric-select');
     if (metricSel) metricSel.addEventListener('change', () => renderMeasurementsChart());
+
+    // Progress Photos Handlers
+    const photoUpload = document.getElementById('photo-upload');
+    if (photoUpload) photoUpload.addEventListener('change', handlePhotoUpload);
+
+    const selBefore = document.getElementById('photo-select-before');
+    const selAfter = document.getElementById('photo-select-after');
+    if (selBefore) selBefore.addEventListener('change', updatePhotoSlider);
+    if (selAfter) selAfter.addEventListener('change', updatePhotoSlider);
+
+    const slider = document.getElementById('photo-slider-input');
+    const clipAfter = document.getElementById('photo-clip-after');
+    if (slider && clipAfter) {
+      slider.addEventListener('input', (e) => {
+        clipAfter.style.width = e.target.value + '%';
+      });
+    }
   }
 
-  return { render, init };
+  return { render, init, sharePR };
 })();

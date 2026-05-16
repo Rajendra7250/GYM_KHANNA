@@ -97,14 +97,14 @@
           <div class="quick-action-label">Log Food</div>
         </div>
       </div>
-      <div class="card" style="margin-bottom:var(--sp-xl);">
-        <div class="section-title"><h3>Weekly Activity</h3></div>
-        <div class="chart-container"><canvas id="chart-weekly" height="220"></canvas></div>
-      </div>
       <!-- Calendar Heatmap -->
       <div class="card" style="margin-bottom: var(--sp-xl);">
         <div class="section-title"><h3>Activity Calendar 📅</h3></div>
         <div id="heatmap-container" style="overflow-x:auto; padding-bottom:var(--sp-xs);"></div>
+      </div>
+      <div class="card" style="margin-bottom:var(--sp-xl);">
+        <div class="section-title"><h3>Weekly Activity</h3></div>
+        <div class="chart-container"><canvas id="chart-weekly" height="220"></canvas></div>
       </div>
     </section>
 
@@ -255,6 +255,40 @@
           </select>
         </div>
         <div class="chart-container"><canvas id="chart-measurements" height="200"></canvas></div>
+      </div>
+
+      <!-- Progress Photos -->
+      <div class="card" style="margin-bottom:var(--sp-xl);">
+        <div class="section-title"><h3>Progress Photos 📸</h3></div>
+        <div style="display:flex; gap:var(--sp-md); margin-bottom:var(--sp-md);">
+          <label class="btn btn-primary" style="flex:1; text-align:center; cursor:pointer;">
+            Upload / Take Photo
+            <input type="file" id="photo-upload" accept="image/*" capture="environment" style="display:none;">
+          </label>
+        </div>
+        <div id="photo-comparison-container" style="display:none;">
+          <div style="display:flex; gap:var(--sp-sm); margin-bottom:var(--sp-sm);">
+            <div style="flex:1;">
+              <label class="form-label">Before</label>
+              <select class="form-select" id="photo-select-before"></select>
+            </div>
+            <div style="flex:1;">
+              <label class="form-label">After</label>
+              <select class="form-select" id="photo-select-after"></select>
+            </div>
+          </div>
+          <div style="position:relative; width:100%; aspect-ratio:3/4; background:var(--bg-tertiary); border-radius:var(--r-md); overflow:hidden;" id="photo-slider-area">
+            <img id="photo-img-before" style="position:absolute; top:0; left:0; width:100%; height:100%; object-fit:cover;">
+            <div id="photo-clip-after" style="position:absolute; top:0; left:0; width:50%; height:100%; overflow:hidden; border-right:2px solid var(--primary);">
+              <img id="photo-img-after" style="position:absolute; top:0; left:0; height:100%; object-fit:cover;">
+            </div>
+            <input type="range" min="0" max="100" value="50" id="photo-slider-input" style="position:absolute; top:0; left:0; width:100%; height:100%; opacity:0; cursor:ew-resize;">
+          </div>
+        </div>
+        <div id="photo-empty" class="empty-state">
+          <div class="empty-state-icon">📷</div>
+          <div class="empty-state-text">Take your first progress photo to start tracking!</div>
+        </div>
       </div>
 
       <div class="section-title"><h3>Personal Records 🏆</h3></div>
@@ -454,6 +488,14 @@
           <option value='{"n":"Chapati (1)","c":104,"p":3.1,"cb":18,"f":3.7}'>Chapati (1)</option>
         </select>
       </div>
+      <div class="form-group" style="display:flex; justify-content:space-between; align-items:center;">
+        <label class="form-label" style="margin:0;">Or Scan Barcode</label>
+        <button type="button" class="btn btn-ghost" id="btn-scan-barcode" style="padding:4px 8px;">
+          📷 Scan
+        </button>
+      </div>
+      <div id="barcode-scanner-container" style="display:none; width:100%; margin-bottom:var(--sp-md); border-radius:var(--r-md); overflow:hidden;"></div>
+      
       <div class="form-group">
         <label class="form-label">Food Name</label>
         <input type="text" class="form-input" id="food-name" placeholder="e.g. Grilled Chicken" required>
@@ -576,6 +618,10 @@
 
 <!-- Toast Container -->
 <div class="toast-container" id="toast-container"></div>
+
+<!-- External Libraries -->
+<script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
+<script src="https://unpkg.com/html5-qrcode"></script>
 
 <script type="module" src="js/firebase-init.js"></script>
 <script src="js/auth.js"></script>

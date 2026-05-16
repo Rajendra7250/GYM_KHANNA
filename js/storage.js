@@ -8,6 +8,7 @@ const Storage = (() => {
     measurements: 'gk_measurements',
     water: 'gk_water',
     sessions: 'gk_sessions',
+    photos: 'gk_photos',
   };
 
   function _get(key) {
@@ -226,6 +227,28 @@ const Storage = (() => {
 
   function getTotalWorkouts() { return getWorkouts().length; }
 
+  // ===== PHOTOS =====
+  function getPhotos() {
+    return _get(KEYS.photos).sort((a, b) => b.timestamp - a.timestamp);
+  }
+  function addPhoto(base64Data, date) {
+    const all = getPhotos();
+    const id = Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
+    const photo = {
+      id,
+      date: date || todayStr(),
+      timestamp: Date.now(),
+      data: base64Data
+    };
+    all.push(photo);
+    _set(KEYS.photos, all);
+    return photo;
+  }
+  function deletePhoto(id) {
+    const all = getPhotos().filter(p => p.id !== id);
+    _set(KEYS.photos, all);
+  }
+
   return {
     todayStr, dateStr, formatDate, isToday,
     getWorkouts, addWorkout, deleteWorkout, getTodayWorkouts, getWorkoutsByDate, getWorkoutsGrouped, getWeeklyActivity,
@@ -236,5 +259,6 @@ const Storage = (() => {
     getWaterLog, getWaterByDate, addWater,
     getSessions, addSession, getLastSession,
     getStreak, getPersonalRecords, getTotalVolume, getTotalWorkouts,
+    getPhotos, addPhoto, deletePhoto,
   };
 })();
