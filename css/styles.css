@@ -440,68 +440,120 @@ h1,h2,h3,h4,h5,h6 { font-family: 'Outfit', sans-serif; font-weight: 700; letter-
 
 /* ===== Responsive ===== */
 @media (max-width: 768px) {
+  /* Prevent ANY horizontal overflow */
+  html, body { overflow-x: hidden; max-width: 100vw; }
+  .app-container { max-width: 100vw; overflow-x: hidden; }
+
   .sidebar { display: none; }
   .bottom-nav { display: block; }
-  .main-content { margin-left: 0; padding: 0 var(--sp-md) 80px; }
-  .stat-cards { grid-template-columns: 1fr 1fr; }
-  .quick-actions { grid-template-columns: 1fr 1fr; }
-  .form-row { grid-template-columns: 1fr; }
-  .pr-grid { grid-template-columns: 1fr 1fr; }
-  .page-header h2 { font-size: 1.4rem; }
+  .main-content {
+    margin-left: 0;
+    padding: 0 var(--sp-md) 90px;
+    max-width: 100vw;
+    overflow-x: hidden;
+  }
 
   /* Mobile Top Bar */
   .mobile-top-bar {
     display: flex; align-items: center; justify-content: space-between;
-    padding: var(--sp-md) 0; margin-bottom: var(--sp-sm);
+    padding: var(--sp-sm) 0 var(--sp-md);
     position: sticky; top: 0; z-index: 50;
     background: var(--bg-primary);
   }
 
-  /* Modals fill screen on mobile */
-  .modal-overlay { padding: var(--sp-sm); align-items: flex-end; }
+  /* Page header */
+  .page-header { margin-bottom: var(--sp-md); }
+  .page-header h2 { font-size: 1.3rem; }
+  .page-header p { font-size: 0.82rem; }
+
+  /* Stat Cards — compact 2-column grid */
+  .stat-cards { grid-template-columns: 1fr 1fr; gap: var(--sp-sm); margin-bottom: var(--sp-md); }
+  .stat-card { padding: var(--sp-md); }
+  .stat-card-icon { width: 32px; height: 32px; font-size: 1rem; margin-bottom: var(--sp-sm); }
+  .stat-card-value { font-size: 1.3rem; }
+  .stat-card-label { font-size: 0.68rem; }
+  .stat-card:hover { transform: none; box-shadow: none; }
+
+  /* Quick Actions */
+  .quick-actions { grid-template-columns: 1fr 1fr; gap: var(--sp-sm); margin-bottom: var(--sp-md); }
+  .quick-action { padding: var(--sp-md); }
+  .quick-action-icon { font-size: 1.3rem; }
+  .quick-action-label { font-size: 0.78rem; }
+
+  /* Cards */
+  .card { padding: var(--sp-md); margin-bottom: var(--sp-md) !important; }
+  .section-title h3 { font-size: 0.95rem; }
+
+  /* Modals — slide up from bottom like native */
+  .modal-overlay { padding: 0; align-items: flex-end; }
   .modal {
-    max-height: 90vh; border-radius: var(--r-xl) var(--r-xl) 0 0;
-    padding: var(--sp-lg) var(--sp-md);
+    max-height: 92vh; width: 100%; max-width: 100%;
+    border-radius: var(--r-xl) var(--r-xl) 0 0;
+    padding: var(--sp-lg) var(--sp-md) var(--sp-2xl);
   }
+
+  /* Forms */
+  .form-row { grid-template-columns: 1fr; gap: var(--sp-sm); }
+  .form-input, .form-select { font-size: 16px; padding: 12px var(--sp-md); } /* 16px prevents iOS zoom on focus */
 
   /* Data items — prevent text overflow */
   .data-item { padding: var(--sp-sm) var(--sp-md); gap: var(--sp-sm); }
-  .data-item-icon { width: 36px; height: 36px; font-size: 1rem; }
-  .data-item-name { font-size: 0.85rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-  .data-item-value { font-size: 0.85rem; }
-  .data-item-meta { font-size: 0.72rem; }
+  .data-item-icon { width: 34px; height: 34px; font-size: 0.95rem; }
+  .data-item-name { font-size: 0.82rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 140px; }
+  .data-item-value { font-size: 0.82rem; }
+  .data-item-meta { font-size: 0.7rem; }
   .data-item-actions { flex-shrink: 0; }
 
-  /* Charts should not overflow */
-  .chart-container { overflow: hidden; }
-  .chart-container canvas { max-width: 100%; }
+  /* Charts — must not overflow */
+  .chart-container { overflow: hidden; max-width: 100%; }
+  .chart-container canvas { max-width: 100% !important; height: auto !important; }
 
-  /* Cards */
-  .card { padding: var(--sp-md); }
+  /* Heatmap container */
+  #heatmap-container { overflow-x: auto; -webkit-overflow-scrolling: touch; max-width: 100%; }
 
-  /* Quick actions smaller */
-  .quick-action { padding: var(--sp-md); }
-  .quick-action h3 { font-size: 0.85rem; }
+  /* Buttons */
+  .btn { font-size: 0.82rem; }
+  .btn-lg { padding: var(--sp-md) var(--sp-lg); }
 
-  /* Toast in safe area */
-  .toast-container { right: var(--sp-md); left: var(--sp-md); }
-  .toast { font-size: 0.8rem; padding: var(--sp-sm) var(--sp-md); }
+  /* Tabs */
+  .tabs { gap: 2px; }
+  .tab { font-size: 0.72rem; padding: var(--sp-sm); }
+
+  /* PR grid */
+  .pr-grid { grid-template-columns: 1fr 1fr; gap: var(--sp-sm); }
+
+  /* Toast */
+  .toast-container { right: var(--sp-md); left: var(--sp-md); top: var(--sp-md); }
+  .toast { font-size: 0.78rem; padding: var(--sp-sm) var(--sp-md); }
+
+  /* Template cards */
+  .template-card { padding: var(--sp-md); }
+
+  /* Weight input row */
+  .weight-input-row { flex-direction: column; gap: var(--sp-sm); }
 }
 
 @media (max-width: 480px) {
-  .stat-cards { grid-template-columns: 1fr; }
-  .quick-actions { grid-template-columns: 1fr 1fr; }
-  .pr-grid { grid-template-columns: 1fr; }
+  .stat-cards { grid-template-columns: 1fr 1fr; gap: 8px; }
+  .stat-card { padding: 12px; }
+  .stat-card-value { font-size: 1.1rem; }
+  .stat-card-label { font-size: 0.62rem; }
+  .stat-card-icon { width: 28px; height: 28px; font-size: 0.9rem; margin-bottom: 6px; }
 
-  /* Even smaller text */
-  .page-header h2 { font-size: 1.2rem; }
-  .page-header p { font-size: 0.8rem; }
-  .section-title h3 { font-size: 1rem; }
-  .btn { font-size: 0.8rem; padding: var(--sp-sm) var(--sp-md); }
+  .page-header h2 { font-size: 1.15rem; }
+  .section-title h3 { font-size: 0.88rem; }
+  .btn { font-size: 0.75rem; padding: 8px 12px; }
 
-  /* Bottom nav tighter */
-  .bottom-nav-item span { font-size: 0.6rem; }
+  .quick-actions { gap: 8px; }
+  .quick-action { padding: 12px; }
+  .quick-action-icon { font-size: 1.1rem; }
+  .quick-action-label { font-size: 0.72rem; }
+
+  .bottom-nav-item span { font-size: 0.58rem; }
   .bottom-nav-item svg { width: 20px; height: 20px; }
+
+  .data-item-name { max-width: 110px; }
+  .pr-grid { grid-template-columns: 1fr; }
 }
 
 /* ===== Toasts ===== */

@@ -115,14 +115,19 @@ const Dashboard = (() => {
       activity[w.date] = (activity[w.date] || 0) + 1;
     });
 
+    // On mobile, show fewer weeks so it fits without overflow
+    const isMobile = window.innerWidth <= 480;
+    const numWeeks = isMobile ? 16 : 52;
+    const boxSize = isMobile ? 10 : 14;
+    const gap = isMobile ? 2 : 4;
+
     const today = new Date();
-    // 52 weeks ago
     const startDate = new Date(today);
-    startDate.setDate(today.getDate() - (52 * 7));
+    startDate.setDate(today.getDate() - (numWeeks * 7));
     // Back to Sunday
     startDate.setDate(startDate.getDate() - startDate.getDay());
 
-    let html = '<div style="display:flex; gap:4px;">';
+    let html = `<div style="display:flex; gap:${gap}px;">`;
     let current = new Date(startDate);
     
     // Fill weeks
@@ -140,7 +145,7 @@ const Dashboard = (() => {
     if (currentWeek.length > 0) weeks.push(currentWeek);
 
     weeks.forEach(week => {
-      html += '<div style="display:flex; flex-direction:column; gap:4px;">';
+      html += `<div style="display:flex; flex-direction:column; gap:${gap}px;">`;
       week.forEach(day => {
         let intensity = 0;
         if (day.count > 0) intensity = 1;
@@ -154,7 +159,7 @@ const Dashboard = (() => {
                       intensity === 3 ? 'rgba(234,234,234, 0.7)' :
                       '#eaeaea';
         
-        html += `<div class="heatmap-box" style="width:14px; height:14px; border-radius:3px; background:${color}; transition:transform 0.2s, opacity 0.2s; cursor:pointer;" title="${Storage.formatDate(day.date)}: ${day.count} exercises"></div>`;
+        html += `<div class="heatmap-box" style="width:${boxSize}px; height:${boxSize}px; border-radius:2px; background:${color}; transition:transform 0.2s; cursor:pointer;" title="${Storage.formatDate(day.date)}: ${day.count} exercises"></div>`;
       });
       html += '</div>';
     });
