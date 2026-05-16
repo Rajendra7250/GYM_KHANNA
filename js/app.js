@@ -251,6 +251,8 @@ const App = (() => {
       activeSwipeElement = swipeContent;
       touchStartX = e.touches[0].clientX;
       swipeContent.style.transition = 'none';
+      const bg = activeSwipeElement.parentElement.querySelector('.swipe-background');
+      if (bg) bg.style.transition = 'none';
     }, { passive: true });
 
     document.addEventListener('touchmove', e => {
@@ -261,6 +263,8 @@ const App = (() => {
         // Add resistance
         const translate = Math.max(diff, -100);
         activeSwipeElement.style.transform = `translateX(${translate}px)`;
+        const bg = activeSwipeElement.parentElement.querySelector('.swipe-background');
+        if (bg) bg.style.opacity = Math.min(Math.abs(translate) / 50, 1);
       }
     }, { passive: true });
 
@@ -275,6 +279,11 @@ const App = (() => {
         if (btnDelete) btnDelete.click();
       } else {
         activeSwipeElement.style.transform = `translateX(0)`;
+        const bg = activeSwipeElement.parentElement.querySelector('.swipe-background');
+        if (bg) {
+          bg.style.transition = 'opacity 0.2s ease';
+          bg.style.opacity = 0;
+        }
       }
       activeSwipeElement = null;
     });

@@ -6,8 +6,8 @@
   <meta name="description" content="GymKhanna — Track your workouts, nutrition, and fitness progress. Built for gym rats who mean business.">
   <title>GymKhanna | Fitness Tracker for Gym Rats</title>
   <link rel="stylesheet" href="css/styles.css">
-  <link rel="icon" href="icon.svg">
-  <link rel="apple-touch-icon" href="icon.svg">
+  <link rel="icon" href="logo.png">
+  <link rel="apple-touch-icon" href="logo.png">
   <link rel="manifest" href="manifest.json">
   <meta name="theme-color" content="#1a1a1e">
 </head>
@@ -19,7 +19,7 @@
   <!-- Sidebar Navigation -->
   <aside class="sidebar" id="sidebar">
     <div class="sidebar-logo">
-      <div class="logo-icon">🏋️</div>
+      <img src="logo.png" alt="GymKhanna Logo" style="width: 32px; height: 32px; object-fit: contain;">
       <h1>GymKhanna</h1>
     </div>
     <nav class="sidebar-nav">
@@ -52,6 +52,7 @@
       <button class="btn btn-ghost" id="btn-auth" onclick="Auth.handleAuthClick(event)" style="width:100%; justify-content:center; gap:var(--sp-sm);">
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg> <span>Login to Sync</span>
       </button>
+      <div style="text-align:center; font-size:0.7rem; color:var(--text-muted); margin-top:var(--sp-md); font-weight:600; letter-spacing:1px;">v1.0.0</div>
     </div>
   </aside>
 
@@ -431,6 +432,11 @@
             </div>
             <div class="form-group"></div>
           </div>
+          <div class="form-group" style="margin-top:var(--sp-md);">
+            <label class="form-label">Gemini API Key (for AI Coach)</label>
+            <input type="password" class="form-input" id="set-gemini-key" placeholder="Paste your API key here">
+            <div style="font-size:0.75rem; color:var(--text-muted); margin-top:4px;">Get a free key at <a href="https://aistudio.google.com/apikey" target="_blank" style="color:var(--primary);">aistudio.google.com</a></div>
+          </div>
           <button type="submit" class="btn btn-primary" style="margin-top:var(--sp-sm);">Save Settings</button>
         </form>
       </div>
@@ -445,6 +451,9 @@
             <input type="file" id="file-import" accept=".json" style="display:none;">
           </label>
         </div>
+      </div>
+      <div style="text-align:center; padding-bottom:var(--sp-xl); font-size:0.75rem; color:var(--text-muted); font-weight:600; letter-spacing:1px;">
+        GymKhanna v1.0.0
       </div>
     </section>
   </main>
@@ -516,8 +525,9 @@
 <!-- Add Food Modal -->
 <div class="modal-overlay" id="modal-food">
   <div class="modal">
-    <div class="modal-header">
-      <h3>Log Food</h3>
+    <div class="header-logo">
+      <img src="logo.png" alt="GymKhanna Logo" style="width: 24px; height: 24px; object-fit: contain;">
+      <h2>Log Food</h2>
       <button class="modal-close" data-close="modal-food">✕</button>
     </div>
     <form id="form-food">

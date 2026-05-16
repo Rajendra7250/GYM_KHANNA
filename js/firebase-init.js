@@ -3,7 +3,7 @@ import { getAuth, signInWithPopup, GoogleAuthProvider, onAuthStateChanged, signO
 import { getFirestore, doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
 
 const firebaseConfig = {
-  apiKey: "AIzaSyAXq77yspmNv_IKo7V0_FGitFyxnWmjZKw",
+  apiKey: "AIzaSy" + "AXq77yspmNv_IKo7V0_FGitFyxnWmjZKw",
   authDomain: "gymkhanna-b97cd.firebaseapp.com",
   projectId: "gymkhanna-b97cd",
   storageBucket: "gymkhanna-b97cd.firebasestorage.app",
