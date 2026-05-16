@@ -117,10 +117,18 @@ const Auth = (() => {
         const photo = currentUser.photoURL
           ? `<img src="${currentUser.photoURL}" style="width:24px; height:24px; border-radius:50%;">`
           : `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>`;
-        btn.innerHTML = `${photo} <span>Logout</span>`;
+        if (btn.id === 'btn-auth-mobile') {
+          btn.innerHTML = photo;
+        } else {
+          btn.innerHTML = `${photo} <span>Logout</span>`;
+        }
         btn.classList.add('logged-in');
       } else {
-        btn.innerHTML = `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg> <span>Login</span>`;
+        if (btn.id === 'btn-auth-mobile') {
+          btn.innerHTML = `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>`;
+        } else {
+          btn.innerHTML = `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg> <span>Login</span>`;
+        }
         btn.classList.remove('logged-in');
       }
     });
