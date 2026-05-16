@@ -3,31 +3,31 @@ const ExerciseLibrary = (() => {
   const categories = [
     {
       name: "Chest",
-      exercises: ["Bench Press", "Incline Bench Press", "Dumbbell Flyes", "Push Ups", "Cable Crossover"]
+      exercises: ["Bench Press", "Incline Bench Press", "Decline Bench Press", "Dumbbell Flyes", "Push Ups", "Cable Crossover", "Machine Chest Press", "Pec Deck", "Dips"]
     },
     {
       name: "Back",
-      exercises: ["Deadlift", "Pull Ups", "Barbell Row", "Lat Pulldown", "Seated Cable Row"]
+      exercises: ["Deadlift", "Pull Ups", "Chin Ups", "Barbell Row", "Dumbbell Row", "Lat Pulldown", "Seated Cable Row", "T-Bar Row", "Straight Arm Pulldown", "Good Mornings"]
     },
     {
       name: "Legs",
-      exercises: ["Squat", "Leg Press", "Romanian Deadlift", "Lunges", "Leg Curl", "Calf Raises"]
+      exercises: ["Squat", "Front Squat", "Hack Squat", "Leg Press", "Romanian Deadlift", "Lunges", "Bulgarian Split Squat", "Leg Extension", "Leg Curl", "Calf Raises", "Hip Thrust"]
     },
     {
       name: "Shoulders",
-      exercises: ["Overhead Press", "Lateral Raises", "Face Pulls", "Arnold Press"]
+      exercises: ["Overhead Press", "Dumbbell Shoulder Press", "Lateral Raises", "Front Raises", "Reverse Pec Deck", "Face Pulls", "Arnold Press", "Upright Row", "Shrugs"]
     },
     {
       name: "Arms",
-      exercises: ["Barbell Curl", "Tricep Pushdown", "Hammer Curl", "Skull Crushers"]
+      exercises: ["Barbell Curl", "Dumbbell Curl", "Preacher Curl", "Hammer Curl", "Cable Curl", "Tricep Pushdown", "Overhead Tricep Extension", "Skull Crushers", "Close Grip Bench Press", "Tricep Kickbacks"]
     },
     {
       name: "Core",
-      exercises: ["Plank", "Crunches", "Hanging Leg Raise", "Cable Woodchop"]
+      exercises: ["Plank", "Crunches", "Sit Ups", "Hanging Leg Raise", "Ab Wheel Rollout", "Russian Twists", "Cable Woodchop", "Bicycle Crunches"]
     },
     {
       name: "Cardio",
-      exercises: ["Running", "Cycling", "Jump Rope", "Rowing"]
+      exercises: ["Running", "Cycling", "Jump Rope", "Rowing", "Stairmaster", "Elliptical", "Swimming"]
     }
   ];
 

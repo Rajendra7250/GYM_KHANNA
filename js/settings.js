@@ -78,6 +78,10 @@ const Settings = (() => {
       unit: document.getElementById('set-unit').value,
       theme: getSettings().theme || 'dark'
     };
+    
+    // Preserve restTimers
+    const oldSettings = getSettings();
+    if (oldSettings.restTimers) s.restTimers = oldSettings.restTimers;
     saveSettings(s);
     App.toast("Settings saved!", "success");
     // Re-render pages

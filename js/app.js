@@ -174,6 +174,7 @@ const App = (() => {
     Progress.init();
     Analytics.init();
     Programs.init();
+    AI.init();
 
     // Render dashboard
     Dashboard.render();

@@ -105,6 +105,18 @@
           <div class="quick-action-label">Log Food</div>
         </div>
       </div>
+
+      <!-- AI Coach -->
+      <div class="card" style="margin-bottom:var(--sp-xl);">
+        <div class="section-title"><h3>AI Coach 🤖</h3></div>
+        <div style="display:flex; gap:var(--sp-sm); margin-bottom:var(--sp-lg); flex-wrap:wrap;">
+          <button class="btn btn-primary" id="btn-ai-suggest">What should I train?</button>
+          <button class="btn btn-ghost" id="btn-ai-deload">Deload check</button>
+        </div>
+        <div id="ai-suggestion-content" style="margin-bottom:var(--sp-md);"></div>
+        <div id="ai-deload-content"></div>
+      </div>
+
       <!-- Calendar Heatmap -->
       <div class="card" style="margin-bottom: var(--sp-xl);">
         <div class="section-title"><h3>Activity Calendar 📅</h3></div>
@@ -133,6 +145,30 @@
           </div>
         </div>
         <button class="btn btn-primary" id="btn-session-toggle">Start Workout</button>
+      </div>
+
+      <!-- Custom Rest Timers -->
+      <div class="card" style="margin-bottom: var(--sp-lg);">
+        <div class="section-title"><h3>Rest Timers (seconds)</h3></div>
+        <form id="form-timers">
+          <div class="form-row">
+            <div class="form-group"><label class="form-label">Chest</label><input type="number" class="form-input" id="timer-chest" required></div>
+            <div class="form-group"><label class="form-label">Back</label><input type="number" class="form-input" id="timer-back" required></div>
+          </div>
+          <div class="form-row">
+            <div class="form-group"><label class="form-label">Legs</label><input type="number" class="form-input" id="timer-legs" required></div>
+            <div class="form-group"><label class="form-label">Shoulders</label><input type="number" class="form-input" id="timer-shoulders" required></div>
+          </div>
+          <div class="form-row">
+            <div class="form-group"><label class="form-label">Arms</label><input type="number" class="form-input" id="timer-arms" required></div>
+            <div class="form-group"><label class="form-label">Core</label><input type="number" class="form-input" id="timer-core" required></div>
+          </div>
+          <div class="form-row">
+            <div class="form-group"><label class="form-label">Cardio</label><input type="number" class="form-input" id="timer-cardio" required></div>
+            <div class="form-group"><label class="form-label">Other</label><input type="number" class="form-input" id="timer-other" required></div>
+          </div>
+          <button type="submit" class="btn btn-primary" style="margin-top:var(--sp-sm);">Save Timers</button>
+        </form>
       </div>
 
       <div class="section-title">
@@ -326,6 +362,8 @@
         <div id="weekly-comparison-table"></div>
       </div>
 
+
+
       <!-- Programs Section -->
       <div class="card" style="margin-bottom:var(--sp-xl);">
         <div class="section-title">
@@ -334,6 +372,9 @@
         <div style="display:flex; gap:var(--sp-sm); margin-bottom:var(--sp-lg); flex-wrap:wrap;">
           <button class="btn btn-primary" id="btn-add-ppl">+ Push/Pull/Legs</button>
           <button class="btn btn-ghost" id="btn-add-ul">+ Upper/Lower</button>
+          <button class="btn btn-ghost" id="btn-add-fb">+ Full Body</button>
+          <button class="btn btn-ghost" id="btn-add-bro">+ Bro Split</button>
+          <button class="btn btn-ghost" id="btn-custom-program" style="border-style:dashed;">✏️ Custom</button>
         </div>
         <div id="programs-list"></div>
       </div>
@@ -391,31 +432,6 @@
             <div class="form-group"></div>
           </div>
           <button type="submit" class="btn btn-primary" style="margin-top:var(--sp-sm);">Save Settings</button>
-          <button type="submit" class="btn btn-primary" style="margin-top:var(--sp-sm);">Save Settings</button>
-        </form>
-      </div>
-
-      <!-- Custom Rest Timers -->
-      <div class="card" style="margin-bottom: var(--sp-xl);">
-        <div class="section-title"><h3>Rest Timers (seconds)</h3></div>
-        <form id="form-timers">
-          <div class="form-row">
-            <div class="form-group"><label class="form-label">Chest</label><input type="number" class="form-input" id="timer-chest" required></div>
-            <div class="form-group"><label class="form-label">Back</label><input type="number" class="form-input" id="timer-back" required></div>
-          </div>
-          <div class="form-row">
-            <div class="form-group"><label class="form-label">Legs</label><input type="number" class="form-input" id="timer-legs" required></div>
-            <div class="form-group"><label class="form-label">Shoulders</label><input type="number" class="form-input" id="timer-shoulders" required></div>
-          </div>
-          <div class="form-row">
-            <div class="form-group"><label class="form-label">Arms</label><input type="number" class="form-input" id="timer-arms" required></div>
-            <div class="form-group"><label class="form-label">Core</label><input type="number" class="form-input" id="timer-core" required></div>
-          </div>
-          <div class="form-row">
-            <div class="form-group"><label class="form-label">Cardio</label><input type="number" class="form-input" id="timer-cardio" required></div>
-            <div class="form-group"><label class="form-label">Other</label><input type="number" class="form-input" id="timer-other" required></div>
-          </div>
-          <button type="submit" class="btn btn-primary" style="margin-top:var(--sp-sm);">Save Timers</button>
         </form>
       </div>
 
@@ -446,9 +462,12 @@
     <form id="form-workout">
       <div class="form-group">
         <label class="form-label">Exercise</label>
-        <select class="form-select" id="workout-exercise" required>
-          <option value="">Select or type below...</option>
-        </select>
+        <div style="display:flex; gap:var(--sp-sm);">
+          <select class="form-select" id="workout-exercise" required style="flex:1;">
+            <option value="">Select or type below...</option>
+          </select>
+          <button type="button" class="btn btn-ghost" onclick="const ex = document.getElementById('workout-exercise').value; if(ex) AI.suggestAlternatives(ex); else App.toast('Select an exercise first', 'warning');" title="AI Alternatives">🤖</button>
+        </div>
       </div>
       <div class="form-group">
         <label class="form-label">Or type custom exercise</label>
@@ -660,6 +679,40 @@
   </div>
 </div>
 
+<!-- Custom Program Builder Modal -->
+<div class="modal-overlay" id="modal-custom-program">
+  <div class="modal" style="max-width:560px;">
+    <div class="modal-header">
+      <h3>Create Custom Program</h3>
+      <button class="modal-close" data-close="modal-custom-program">✕</button>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Program Name</label>
+      <input type="text" class="form-input" id="custom-program-name" placeholder="My Custom Program">
+    </div>
+    <div class="form-group">
+      <label class="form-label">Duration (weeks)</label>
+      <input type="number" class="form-input" id="custom-program-weeks" value="4" min="1" max="16">
+    </div>
+    <div id="custom-days-container">
+      <div class="custom-day-block" style="background:var(--bg-card); padding:var(--sp-md); border-radius:var(--r-md); border:1px solid var(--border-glass); margin-bottom:var(--sp-md);">
+        <div class="form-group">
+          <label class="form-label">Day 1 Name</label>
+          <input type="text" class="form-input custom-day-name" placeholder="e.g. Push Day">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Exercises (one per line: Name, muscle, sets, reps)</label>
+          <textarea class="form-input custom-day-exercises" rows="4" placeholder="Bench Press, chest, 4, 8&#10;Overhead Press, shoulders, 3, 10"></textarea>
+        </div>
+      </div>
+    </div>
+    <div style="display:flex; gap:var(--sp-sm);">
+      <button class="btn btn-ghost" id="btn-add-day" style="flex:1;">+ Add Day</button>
+      <button class="btn btn-primary" id="btn-save-custom-program" style="flex:1;">Save Program</button>
+    </div>
+  </div>
+</div>
+
 <!-- View Program Modal -->
 <div class="modal-overlay" id="modal-view-program">
   <div class="modal" style="max-width:560px;">
@@ -755,6 +808,7 @@
 <script src="js/progress.js"></script>
 <script src="js/analytics.js"></script>
 <script src="js/programs.js"></script>
+<script src="js/ai.js"></script>
 <script src="js/app.js"></script>
 </body>
 </html>
