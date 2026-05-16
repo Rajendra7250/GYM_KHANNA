@@ -229,27 +229,7 @@ const Storage = (() => {
 
   function getTotalWorkouts() { return getWorkouts().length; }
 
-  // ===== PHOTOS =====
-  function getPhotos() {
-    return _get(KEYS.photos).sort((a, b) => b.timestamp - a.timestamp);
-  }
-  function addPhoto(base64Data, date) {
-    const all = getPhotos();
-    const id = Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
-    const photo = {
-      id,
-      date: date || todayStr(),
-      timestamp: Date.now(),
-      data: base64Data
-    };
-    all.push(photo);
-    _set(KEYS.photos, all);
-    return photo;
-  }
-  function deletePhoto(id) {
-    const all = getPhotos().filter(p => p.id !== id);
-    _set(KEYS.photos, all);
-  }
+
 
   // ===== PROGRAMS =====
   function getPrograms() { return _get(KEYS.programs); }
@@ -366,7 +346,6 @@ const Storage = (() => {
     getWaterLog, getWaterByDate, addWater,
     getSessions, addSession, getLastSession,
     getStreak, getPersonalRecords, getTotalVolume, getTotalWorkouts,
-    getPhotos, addPhoto, deletePhoto,
     getPrograms, addProgram, updateProgram, deleteProgram, getActiveProgram, setActiveProgram,
     getMuscleDistribution, getVolumeOverTime, getCaloriesOverTime, getWeeklyComparison,
     getExerciseHistory, suggestWeight,

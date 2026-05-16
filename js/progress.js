@@ -178,8 +178,8 @@ const Progress = (() => {
   }
 
   // ===== PROGRESS PHOTOS =====
-  function renderPhotos() {
-    const photos = Storage.getPhotos();
+  async function renderPhotos() {
+    const photos = await PhotoDB.getPhotos();
     const gallery = document.getElementById('photo-gallery');
     const emptyState = document.getElementById('photo-empty');
     const compareBtn = document.getElementById('btn-compare-photos');
@@ -229,8 +229,8 @@ const Progress = (() => {
     }
   }
 
-  function updatePhotoComparison() {
-    const photos = Storage.getPhotos();
+  async function updatePhotoComparison() {
+    const photos = await PhotoDB.getPhotos();
     const idB = document.getElementById('photo-select-before').value;
     const idA = document.getElementById('photo-select-after').value;
     
@@ -270,9 +270,13 @@ const Progress = (() => {
         
         // Export as WebP for smaller size
         const base64 = canvas.toDataURL('image/webp', 0.8);
-        Storage.addPhoto(base64);
-        App.toast('Progress photo saved!', 'success');
-        renderPhotos();
+        PhotoDB.savePhoto(base64).then(() => {
+          App.toast('Progress photo saved!', 'success');
+          renderPhotos();
+        }).catch(err => {
+          console.error(err);
+          App.toast('Failed to save photo locally', 'error');
+        });
       };
       img.src = ev.target.result;
     };
