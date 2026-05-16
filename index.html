@@ -39,6 +39,10 @@
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
         Progress
       </a>
+      <a class="nav-item" data-page="analytics" id="nav-analytics">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 21H3V3"/><path d="M21 9l-6 6-4-4-6 6"/></svg>
+        Analytics
+      </a>
       <a class="nav-item" data-page="settings" id="nav-settings">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-2 2 2 2 0 01-2-2v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83 0 2 2 0 010-2.83l.06-.06a1.65 1.65 0 00.33-1.82 1.65 1.65 0 00-1.51-1H3a2 2 0 01-2-2 2 2 0 012-2h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 010-2.83 2 2 0 012.83 0l.06.06a1.65 1.65 0 001.82.33H9a1.65 1.65 0 001-1.51V3a2 2 0 012-2 2 2 0 012 2v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 0 2 2 0 010 2.83l-.06.06a1.65 1.65 0 00-.33 1.82V9a1.65 1.65 0 001.51 1H21a2 2 0 012 2 2 2 0 01-2 2h-.09a1.65 1.65 0 00-1.51 1z"/></svg>
         Settings
@@ -69,6 +73,10 @@
       <button class="bottom-nav-item" data-page="progress">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
         <span>Progress</span>
+      </button>
+      <button class="bottom-nav-item" data-page="analytics">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 21H3V3"/><path d="M21 9l-6 6-4-4-6 6"/></svg>
+        <span>Analytics</span>
       </button>
       <button class="bottom-nav-item" data-page="settings">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-2 2 2 2 0 01-2-2v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83 0 2 2 0 010-2.83l.06-.06a1.65 1.65 0 00.33-1.82 1.65 1.65 0 00-1.51-1H3a2 2 0 01-2-2 2 2 0 012-2h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 010-2.83 2 2 0 012.83 0l.06.06a1.65 1.65 0 001.82.33H9a1.65 1.65 0 001-1.51V3a2 2 0 012-2 2 2 0 012 2v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 0 2 2 0 010 2.83l-.06.06a1.65 1.65 0 00-.33 1.82V9a1.65 1.65 0 001.51 1H21a2 2 0 012 2 2 2 0 01-2 2h-.09a1.65 1.65 0 00-1.51 1z"/></svg>
@@ -136,6 +144,9 @@
       <div class="templates-list" id="templates-list" style="display:flex; gap:var(--sp-md); overflow-x:auto; padding-bottom:var(--sp-md); margin-bottom:var(--sp-lg);">
         <!-- Templates injected here -->
       </div>
+
+      <!-- Active Program for Today -->
+      <div id="active-program-today"></div>
 
       <div class="date-nav" style="margin-bottom:var(--sp-md);">
         <button class="btn-icon" id="workout-prev-day">
@@ -276,6 +287,56 @@
 
       <div class="section-title"><h3>Personal Records 🏆</h3></div>
       <div class="pr-grid" id="pr-grid"></div>
+    </section>
+
+    <!-- ============ ANALYTICS PAGE ============ -->
+    <section class="page" id="page-analytics">
+      <div class="page-header">
+        <h2>Analytics</h2>
+        <p>Deep dive into your training data</p>
+      </div>
+
+      <!-- Muscle Distribution -->
+      <div class="card" style="margin-bottom:var(--sp-xl);">
+        <div class="section-title"><h3>Muscle Distribution 💪</h3></div>
+        <div style="display:flex; flex-wrap:wrap; gap:var(--sp-lg); align-items:center;">
+          <div style="flex:1; min-width:200px;">
+            <div class="chart-container"><canvas id="chart-muscle-dist" height="220"></canvas></div>
+          </div>
+          <div style="flex:1; min-width:180px;" id="muscle-legend"></div>
+        </div>
+      </div>
+
+      <!-- Volume Over Time -->
+      <div class="card" style="margin-bottom:var(--sp-xl);">
+        <div class="section-title"><h3>Volume Trend (14 Days) 📈</h3></div>
+        <div class="chart-container"><canvas id="chart-volume-trend" height="200"></canvas></div>
+      </div>
+
+      <!-- Calories vs Activity -->
+      <div class="card" style="margin-bottom:var(--sp-xl);">
+        <div class="section-title"><h3>Calories vs Activity 🔥</h3></div>
+        <p style="color:var(--text-muted); font-size:0.8rem; margin-bottom:var(--sp-sm);">Line = Calories · Bars = Volume</p>
+        <div class="chart-container"><canvas id="chart-cal-activity" height="200"></canvas></div>
+      </div>
+
+      <!-- Weekly Comparison -->
+      <div class="card" style="margin-bottom:var(--sp-xl);">
+        <div class="section-title"><h3>Weekly Comparison 📊</h3></div>
+        <div id="weekly-comparison-table"></div>
+      </div>
+
+      <!-- Programs Section -->
+      <div class="card" style="margin-bottom:var(--sp-xl);">
+        <div class="section-title">
+          <h3>Training Programs 📋</h3>
+        </div>
+        <div style="display:flex; gap:var(--sp-sm); margin-bottom:var(--sp-lg); flex-wrap:wrap;">
+          <button class="btn btn-primary" id="btn-add-ppl">+ Push/Pull/Legs</button>
+          <button class="btn btn-ghost" id="btn-add-ul">+ Upper/Lower</button>
+        </div>
+        <div id="programs-list"></div>
+      </div>
     </section>
 
     <!-- ============ SETTINGS PAGE ============ -->
@@ -599,6 +660,17 @@
   </div>
 </div>
 
+<!-- View Program Modal -->
+<div class="modal-overlay" id="modal-view-program">
+  <div class="modal" style="max-width:560px;">
+    <div class="modal-header">
+      <h3>Program Details</h3>
+      <button class="modal-close" data-close="modal-view-program">✕</button>
+    </div>
+    <div id="view-program-content"></div>
+  </div>
+</div>
+
 <!-- Compare Photos Modal -->
 <div class="modal-overlay" id="modal-compare">
   <div class="modal" style="max-width:800px;">
@@ -634,6 +706,35 @@
   <div class="share-badge">CRUSHED IT!</div>
 </div>
 
+<!-- Onboarding Modal -->
+<div class="modal-overlay" id="modal-onboarding">
+  <div class="modal" style="text-align:center; position:relative;">
+    <div id="onboarding-slide-1" class="onboarding-slide active">
+      <div class="onboarding-icon">🏋️</div>
+      <h3 style="font-size:1.5rem; margin-bottom:10px;">Log Your First Workout</h3>
+      <p style="color:var(--text-secondary);">Track every set, rep, and weight. We'll automatically calculate your volume and 1RMs.</p>
+    </div>
+    <div id="onboarding-slide-2" class="onboarding-slide">
+      <div class="onboarding-icon">🥑</div>
+      <h3 style="font-size:1.5rem; margin-bottom:10px;">Track Your Meals</h3>
+      <p style="color:var(--text-secondary);">Log calories and macros. Use the barcode scanner to quickly add packaged foods.</p>
+    </div>
+    <div id="onboarding-slide-3" class="onboarding-slide">
+      <div class="onboarding-icon">📈</div>
+      <h3 style="font-size:1.5rem; margin-bottom:10px;">Watch Your Progress</h3>
+      <p style="color:var(--text-secondary);">Take daily progress photos, track your body weight, and celebrate your new Personal Records!</p>
+    </div>
+    
+    <div class="onboarding-dots">
+      <div class="onboarding-dot active" id="dot-1"></div>
+      <div class="onboarding-dot" id="dot-2"></div>
+      <div class="onboarding-dot" id="dot-3"></div>
+    </div>
+    
+    <button class="btn btn-primary" id="btn-onboarding-next" style="width:100%;">Continue</button>
+  </div>
+</div>
+
 <!-- Toast Container -->
 <div class="toast-container" id="toast-container"></div>
 
@@ -652,6 +753,8 @@
 <script src="js/workouts.js"></script>
 <script src="js/nutrition.js"></script>
 <script src="js/progress.js"></script>
+<script src="js/analytics.js"></script>
+<script src="js/programs.js"></script>
 <script src="js/app.js"></script>
 </body>
 </html>

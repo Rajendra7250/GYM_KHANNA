@@ -35,26 +35,39 @@ const Dashboard = (() => {
       return m + ' min';
     }
 
+    const statsContainer = document.getElementById('dashboard-stats');
+    if (!statsContainer) return;
+    
+    // Initial skeleton render
+    if (!statsContainer.dataset.loaded) {
+      statsContainer.innerHTML = `
+        <div class="stat-card skeleton" style="height:120px;"></div>
+        <div class="stat-card skeleton" style="height:120px;"></div>
+        <div class="stat-card skeleton" style="height:120px;"></div>
+        <div class="stat-card skeleton" style="height:120px;"></div>
+      `;
+    }
+
     const statsHTML = `
       <div class="stat-card purple">
         <div class="stat-card-icon">🏋️</div>
-        <div class="stat-card-value">${todayWorkouts.length}</div>
+        <div class="stat-card-value" data-anim-value="${todayWorkouts.length}">0</div>
         <div class="stat-card-label">Exercises Today</div>
       </div>
       <div class="stat-card pink">
         <div class="stat-card-icon">🔥</div>
-        <div class="stat-card-value">${todayNutrition.calories.toLocaleString()}</div>
+        <div class="stat-card-value" data-anim-value="${todayNutrition.calories}">0</div>
         <div class="stat-card-label">Calories Eaten</div>
       </div>
       <div class="stat-card cyan">
         <div class="stat-card-icon">⚡</div>
-        <div class="stat-card-value">${totalVol > 0 ? (totalVol / 1000).toFixed(1) + 'k' : '0'}</div>
+        <div class="stat-card-value" data-anim-value="${totalVol > 0 ? (totalVol / 1000).toFixed(1) : '0'}">0</div>
         <div class="stat-card-label">Volume (kg)</div>
       </div>
       <div class="stat-card fire">
         <div class="stat-card-icon">🔥</div>
         <div class="stat-card-value" style="display:flex; align-items:center; gap:8px;">
-          ${streak}
+          <span data-anim-value="${streak}">0</span>
           ${streak >= 100 ? '<span title="100-Day Streak" style="font-size:1.2rem; animation:badgePulse 2s infinite;">🥇</span>' : 
             streak >= 30 ? '<span title="30-Day Streak" style="font-size:1.2rem; animation:badgePulse 2s infinite;">🥈</span>' : 
             streak >= 7 ? '<span title="7-Day Streak" style="font-size:1.2rem; animation:badgePulse 2s infinite;">🥉</span>' : ''}
@@ -68,11 +81,21 @@ const Dashboard = (() => {
       </div>
       <div class="stat-card">
         <div class="stat-card-icon">💧</div>
-        <div class="stat-card-value">${waterMl >= 1000 ? (waterMl / 1000).toFixed(1) + 'L' : waterMl + 'ml'}</div>
-        <div class="stat-card-label">Water Today</div>
+        <div class="stat-card-value" data-anim-value="${waterMl > 0 ? (waterMl/1000).toFixed(1) : '0'}">0</div>
+        <div class="stat-card-label">Water Today (L)</div>
       </div>
     `;
-    document.getElementById('dashboard-stats').innerHTML = statsHTML;
+
+    // Apply real data after a tiny delay for effect if first load
+    setTimeout(() => {
+      statsContainer.innerHTML = statsHTML;
+      statsContainer.dataset.loaded = 'true';
+      
+      statsContainer.querySelectorAll('[data-anim-value]').forEach(el => {
+        const val = parseFloat(el.dataset.animValue);
+        if (!isNaN(val)) App.animateNumber(el, val);
+      });
+    }, statsContainer.dataset.loaded ? 0 : 300);
 
     // Weekly chart
     const weekly = Storage.getWeeklyActivity();

@@ -102,28 +102,45 @@ const Nutrition = (() => {
     // Nutrition stats
     const statsEl = document.getElementById('nutrition-stats');
     if (statsEl) {
-      statsEl.innerHTML = `
+      if (!statsEl.dataset.loaded) {
+        statsEl.innerHTML = `
+          <div class="stat-card skeleton" style="height:100px;"></div>
+          <div class="stat-card skeleton" style="height:100px;"></div>
+          <div class="stat-card skeleton" style="height:100px;"></div>
+          <div class="stat-card skeleton" style="height:100px;"></div>
+        `;
+      }
+      
+      const statsHTML = `
         <div class="stat-card pink">
           <div class="stat-card-icon">🔥</div>
-          <div class="stat-card-value">${nutrition.calories.toLocaleString()}</div>
+          <div class="stat-card-value" data-anim-value="${nutrition.calories}">0</div>
           <div class="stat-card-label">Calories</div>
         </div>
         <div class="stat-card cyan">
           <div class="stat-card-icon">🥩</div>
-          <div class="stat-card-value">${nutrition.protein.toFixed(1)}g</div>
-          <div class="stat-card-label">Protein</div>
+          <div class="stat-card-value" data-anim-value="${nutrition.protein}">0</div>
+          <div class="stat-card-label">Protein (g)</div>
         </div>
         <div class="stat-card purple">
           <div class="stat-card-icon">🍚</div>
-          <div class="stat-card-value">${nutrition.carbs.toFixed(1)}g</div>
-          <div class="stat-card-label">Carbs</div>
+          <div class="stat-card-value" data-anim-value="${nutrition.carbs}">0</div>
+          <div class="stat-card-label">Carbs (g)</div>
         </div>
         <div class="stat-card fire">
           <div class="stat-card-icon">🥑</div>
-          <div class="stat-card-value">${nutrition.fat.toFixed(1)}g</div>
-          <div class="stat-card-label">Fat</div>
+          <div class="stat-card-value" data-anim-value="${nutrition.fat}">0</div>
+          <div class="stat-card-label">Fat (g)</div>
         </div>
       `;
+
+      setTimeout(() => {
+        statsEl.innerHTML = statsHTML;
+        statsEl.dataset.loaded = 'true';
+        statsEl.querySelectorAll('[data-anim-value]').forEach(el => {
+          App.animateNumber(el, parseFloat(el.dataset.animValue));
+        });
+      }, statsEl.dataset.loaded ? 0 : 300);
     }
 
     // Macro bars
@@ -181,22 +198,25 @@ const Nutrition = (() => {
 
       mealFoods.forEach(f => {
         html += `
-          <div class="data-item">
-            <div class="data-item-icon" style="background:rgba(255,255,255,0.05)">🍗</div>
-            <div class="data-item-info">
-              <div class="data-item-name">${f.name}</div>
-              <div class="data-item-meta">
-                P: ${f.protein || 0}g &nbsp; C: ${f.carbs || 0}g &nbsp; F: ${f.fat || 0}g
-              </div>
+          <div class="swipe-item">
+            <div class="swipe-background">
+              🗑️ Delete
             </div>
-            <div class="data-item-value">${(f.calories || 0).toLocaleString()} kcal</div>
-            <div class="data-item-actions">
-              <button class="btn-icon" onclick="Nutrition.edit('${f.id}')" title="Edit">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
-              </button>
-              <button class="btn-icon" onclick="Nutrition.remove('${f.id}')" title="Delete">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2"/></svg>
-              </button>
+            <div class="swipe-content data-item" style="margin:0; border:none;">
+              <div class="data-item-icon" style="background:rgba(255,255,255,0.05)">🍗</div>
+              <div class="data-item-info">
+                <div class="data-item-name">${f.name}</div>
+                <div class="data-item-meta">
+                  P: ${f.protein || 0}g &nbsp; C: ${f.carbs || 0}g &nbsp; F: ${f.fat || 0}g
+                </div>
+              </div>
+              <div class="data-item-value">${(f.calories || 0).toLocaleString()} kcal</div>
+              <div class="data-item-actions">
+                <button class="btn-icon" onclick="Nutrition.edit('${f.id}')" title="Edit">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
+                </button>
+                <button class="btn-icon swipe-action-delete" style="display:none;" onclick="Nutrition.remove('${f.id}')" title="Delete"></button>
+              </div>
             </div>
           </div>
         `;

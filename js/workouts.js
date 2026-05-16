@@ -52,24 +52,27 @@ const Workouts = (() => {
       exercises.forEach((ex, idx) => {
         const vol = (ex.sets || 0) * (ex.reps || 0) * (ex.weight || 0);
         const itemHtml = `
-          <div class="data-item ${ex.supersetId ? 'superset-item' : ''}">
-            <div class="data-item-icon" style="background:rgba(255,255,255,0.05)">${muscleEmojis[ex.muscle] || '⭐'}</div>
-            <div class="data-item-info">
-              <div class="data-item-name" style="cursor:pointer; text-decoration:underline; text-decoration-color:var(--text-muted); text-underline-offset:3px;" onclick="Workouts.showHistory('${ex.exercise.replace(/'/g, "\\'")}')">${ex.exercise}</div>
-              <div class="data-item-meta">
-                <span class="muscle-tag ${ex.muscle}">${ex.muscle}</span>
-                &nbsp; ${ex.sets}×${ex.reps} ${ex.weight ? '@ ' + ex.weight + unit : ''}
-                ${ex.notes ? `<div style="margin-top:4px; font-style:italic; color:var(--text-muted)">"${ex.notes}"</div>` : ''}
-              </div>
+          <div class="swipe-item">
+            <div class="swipe-background">
+              🗑️ Delete
             </div>
-            ${vol > 0 ? `<div class="data-item-value">${vol.toLocaleString()} ${unit}</div>` : ''}
-            <div class="data-item-actions">
-              <button class="btn-icon" onclick="Workouts.edit('${ex.id}')" title="Edit">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
-              </button>
-              <button class="btn-icon" onclick="Workouts.remove('${ex.id}')" title="Delete">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2"/></svg>
-              </button>
+            <div class="swipe-content data-item ${ex.supersetId ? 'superset-item' : ''}" style="margin:0; border:none;">
+              <div class="data-item-icon" style="background:rgba(255,255,255,0.05)">${muscleEmojis[ex.muscle] || '⭐'}</div>
+              <div class="data-item-info">
+                <div class="data-item-name" style="cursor:pointer; text-decoration:underline; text-decoration-color:var(--text-muted); text-underline-offset:3px;" onclick="Workouts.showHistory('${ex.exercise.replace(/'/g, "\\'")}')">${ex.exercise}</div>
+                <div class="data-item-meta">
+                  <span class="muscle-tag ${ex.muscle}">${ex.muscle}</span>
+                  &nbsp; ${ex.sets}×${ex.reps} ${ex.weight ? '@ ' + ex.weight + unit : ''}
+                  ${ex.notes ? `<div style="margin-top:4px; font-style:italic; color:var(--text-muted)">"${ex.notes}"</div>` : ''}
+                </div>
+              </div>
+              ${vol > 0 ? `<div class="data-item-value">${vol.toLocaleString()} ${unit}</div>` : ''}
+              <div class="data-item-actions">
+                <button class="btn-icon" onclick="Workouts.edit('${ex.id}')" title="Edit">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
+                </button>
+                <button class="btn-icon swipe-action-delete" style="display:none;" onclick="Workouts.remove('${ex.id}')" title="Delete"></button>
+              </div>
             </div>
           </div>
         `;

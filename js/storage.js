@@ -9,6 +9,8 @@ const Storage = (() => {
     water: 'gk_water',
     sessions: 'gk_sessions',
     photos: 'gk_photos',
+    programs: 'gk_programs',
+    activeProgram: 'gk_active_program',
   };
 
   function _get(key) {
@@ -249,6 +251,111 @@ const Storage = (() => {
     _set(KEYS.photos, all);
   }
 
+  // ===== PROGRAMS =====
+  function getPrograms() { return _get(KEYS.programs); }
+  function addProgram(p) {
+    const all = getPrograms();
+    p.id = Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
+    p.createdAt = Date.now();
+    all.push(p);
+    _set(KEYS.programs, all);
+    return p;
+  }
+  function updateProgram(id, updates) {
+    const all = getPrograms();
+    const idx = all.findIndex(p => p.id === id);
+    if (idx !== -1) { all[idx] = { ...all[idx], ...updates }; _set(KEYS.programs, all); }
+  }
+  function deleteProgram(id) {
+    _set(KEYS.programs, getPrograms().filter(p => p.id !== id));
+    if (getActiveProgram() === id) setActiveProgram(null);
+  }
+  function getActiveProgram() {
+    try { return JSON.parse(localStorage.getItem(KEYS.activeProgram)); } catch { return null; }
+  }
+  function setActiveProgram(id) {
+    localStorage.setItem(KEYS.activeProgram, JSON.stringify(id));
+  }
+
+  // ===== ANALYTICS HELPERS =====
+  function getMuscleDistribution() {
+    const all = getWorkouts();
+    const dist = {};
+    all.forEach(w => {
+      const m = w.muscle || 'other';
+      const vol = (w.sets || 0) * (w.reps || 0) * (w.weight || 0);
+      dist[m] = (dist[m] || 0) + vol;
+    });
+    return dist;
+  }
+
+  function getVolumeOverTime(days = 30) {
+    const all = getWorkouts();
+    const result = [];
+    for (let i = days - 1; i >= 0; i--) {
+      const d = new Date(); d.setDate(d.getDate() - i);
+      const ds = dateStr(d);
+      const dayWorkouts = all.filter(w => w.date === ds);
+      const vol = dayWorkouts.reduce((s, w) => s + (w.sets || 0) * (w.reps || 0) * (w.weight || 0), 0);
+      result.push({ date: ds, label: d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }), value: vol });
+    }
+    return result;
+  }
+
+  function getCaloriesOverTime(days = 30) {
+    const allFood = getFood();
+    const result = [];
+    for (let i = days - 1; i >= 0; i--) {
+      const d = new Date(); d.setDate(d.getDate() - i);
+      const ds = dateStr(d);
+      const dayFood = allFood.filter(f => f.date === ds);
+      const cals = dayFood.reduce((s, f) => s + (f.calories || 0), 0);
+      result.push({ date: ds, label: d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }), value: cals });
+    }
+    return result;
+  }
+
+  function getWeeklyComparison() {
+    const all = getWorkouts();
+    const allFood = getFood();
+    const weeks = [];
+    for (let w = 0; w < 4; w++) {
+      let totalVol = 0, totalCal = 0, workoutDays = new Set();
+      for (let d = 0; d < 7; d++) {
+        const dt = new Date(); dt.setDate(dt.getDate() - (w * 7 + d));
+        const ds = dateStr(dt);
+        const dayW = all.filter(x => x.date === ds);
+        if (dayW.length > 0) workoutDays.add(ds);
+        totalVol += dayW.reduce((s, x) => s + (x.sets || 0) * (x.reps || 0) * (x.weight || 0), 0);
+        totalCal += allFood.filter(f => f.date === ds).reduce((s, f) => s + (f.calories || 0), 0);
+      }
+      const startD = new Date(); startD.setDate(startD.getDate() - (w * 7 + 6));
+      const endD = new Date(); endD.setDate(endD.getDate() - (w * 7));
+      weeks.push({
+        label: `${startD.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })} - ${endD.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}`,
+        volume: totalVol,
+        calories: totalCal,
+        workoutDays: workoutDays.size,
+        weekNum: w
+      });
+    }
+    return weeks;
+  }
+
+  function getExerciseHistory(exerciseName) {
+    return getWorkouts().filter(w => w.exercise === exerciseName).sort((a, b) => a.timestamp - b.timestamp);
+  }
+
+  function suggestWeight(exerciseName, unit) {
+    const history = getExerciseHistory(exerciseName);
+    if (history.length === 0) return null;
+    const last = history[history.length - 1];
+    const increment = (unit === 'lbs') ? 5 : 2.5;
+    // If they hit target reps, suggest increase
+    if (last.reps >= 5) return last.weight + increment;
+    return last.weight; // Same weight if reps were low
+  }
+
   return {
     todayStr, dateStr, formatDate, isToday,
     getWorkouts, addWorkout, deleteWorkout, getTodayWorkouts, getWorkoutsByDate, getWorkoutsGrouped, getWeeklyActivity,
@@ -260,5 +367,8 @@ const Storage = (() => {
     getSessions, addSession, getLastSession,
     getStreak, getPersonalRecords, getTotalVolume, getTotalWorkouts,
     getPhotos, addPhoto, deletePhoto,
+    getPrograms, addProgram, updateProgram, deleteProgram, getActiveProgram, setActiveProgram,
+    getMuscleDistribution, getVolumeOverTime, getCaloriesOverTime, getWeeklyComparison,
+    getExerciseHistory, suggestWeight,
   };
 })();

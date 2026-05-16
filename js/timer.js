@@ -57,6 +57,7 @@ const Timer = (() => {
   function finish() {
     stop();
     App.toast("Rest time is up! Get back to it! 💪", "success");
+    if (App.haptic) App.haptic('heavy');
     playBeep();
   }
 
