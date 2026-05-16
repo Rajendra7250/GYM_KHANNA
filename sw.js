@@ -1,4 +1,4 @@
-const CACHE_NAME = 'gymkhanna-v1';
+const CACHE_NAME = 'gymkhanna-v3';
 const ASSETS = [
   './',
   './index.html',
@@ -21,6 +21,16 @@ self.addEventListener('install', event => {
   event.waitUntil(
     caches.open(CACHE_NAME)
       .then(cache => cache.addAll(ASSETS))
+  );
+});
+
+self.addEventListener('activate', event => {
+  event.waitUntil(
+    caches.keys().then(cacheNames => {
+      return Promise.all(
+        cacheNames.filter(name => name !== CACHE_NAME).map(name => caches.delete(name))
+      );
+    })
   );
 });
 

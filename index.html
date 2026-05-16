@@ -9,7 +9,7 @@
   <link rel="icon" href="icon.svg">
   <link rel="apple-touch-icon" href="icon.svg">
   <link rel="manifest" href="manifest.json">
-  <meta name="theme-color" content="#a855f7">
+  <meta name="theme-color" content="#1a1a1e">
 </head>
 <body>
 
@@ -275,6 +275,10 @@
         <label class="form-label">Weight (kg)</label>
         <input type="number" class="form-input" id="workout-weight" placeholder="60" min="0" step="0.5">
       </div>
+      <div class="form-group">
+        <label class="form-label">Notes</label>
+        <input type="text" class="form-input" id="workout-notes" placeholder="e.g. felt easy, go heavier next time">
+      </div>
       <button type="submit" class="btn btn-primary btn-lg" style="width:100%; margin-top:var(--sp-sm);">Save Exercise</button>
     </form>
   </div>
@@ -288,6 +292,15 @@
       <button class="modal-close" data-close="modal-food">✕</button>
     </div>
     <form id="form-food">
+      <div class="form-group">
+        <label class="form-label">Meal</label>
+        <select class="form-select" id="food-meal" required>
+          <option value="Breakfast">Breakfast</option>
+          <option value="Lunch">Lunch</option>
+          <option value="Dinner">Dinner</option>
+          <option value="Snack">Snack</option>
+        </select>
+      </div>
       <div class="form-group">
         <label class="form-label">Quick Add</label>
         <select class="form-select" id="food-preset">

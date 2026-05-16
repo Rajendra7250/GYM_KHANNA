@@ -8,7 +8,7 @@ const Settings = (() => {
   function applyTheme(theme) {
     document.documentElement.setAttribute('data-theme', theme);
     const meta = document.querySelector('meta[name="theme-color"]');
-    if (meta) meta.content = theme === 'light' ? '#f4f4f8' : '#a855f7';
+    if (meta) meta.content = theme === 'light' ? '#ededf0' : '#1a1a1e';
     const toggle = document.getElementById('theme-toggle');
     if (toggle) toggle.checked = theme === 'light';
   }

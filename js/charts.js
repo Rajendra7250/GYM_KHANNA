@@ -1,15 +1,15 @@
 /* ===== GymKhanna Charts Module ===== */
 const Charts = (() => {
   const COLORS = {
-    purple: '#a855f7',
-    pink: '#ec4899',
-    cyan: '#06b6d4',
-    orange: '#f97316',
-    green: '#22c55e',
+    purple: '#888892',
+    pink: '#6a6a78',
+    cyan: '#a0a0b0',
+    orange: '#7a7a88',
+    green: '#6ec87a',
     grid: 'rgba(255,255,255,0.04)',
-    text: '#8a8a9a',
-    barGrad1: '#a855f7',
-    barGrad2: '#ec4899',
+    text: '#888892',
+    barGrad1: '#eaeaea',
+    barGrad2: '#888892',
   };
 
   function setupCanvas(canvas) {
@@ -131,8 +131,8 @@ const Charts = (() => {
 
     // Area fill
     const areaGrad = ctx.createLinearGradient(0, padT, 0, padT + chartH);
-    areaGrad.addColorStop(0, 'rgba(6,182,212,0.15)');
-    areaGrad.addColorStop(1, 'rgba(6,182,212,0)');
+    areaGrad.addColorStop(0, 'rgba(234,234,234,0.1)');
+    areaGrad.addColorStop(1, 'rgba(234,234,234,0)');
     ctx.fillStyle = areaGrad;
     ctx.beginPath();
     ctx.moveTo(points[0].x, padT + chartH);
@@ -153,12 +153,12 @@ const Charts = (() => {
 
     // Dots
     points.forEach((p, i) => {
-      ctx.fillStyle = i === points.length - 1 ? COLORS.cyan : 'rgba(6,182,212,0.6)';
+      ctx.fillStyle = i === points.length - 1 ? '#eaeaea' : 'rgba(234,234,234,0.5)';
       ctx.beginPath();
       ctx.arc(p.x, p.y, i === points.length - 1 ? 5 : 3, 0, Math.PI * 2);
       ctx.fill();
       if (i === points.length - 1) {
-        ctx.strokeStyle = 'rgba(6,182,212,0.3)';
+        ctx.strokeStyle = 'rgba(234,234,234,0.2)';
         ctx.lineWidth = 6;
         ctx.stroke();
       }

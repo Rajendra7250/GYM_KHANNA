@@ -29,12 +29,13 @@ const Workouts = (() => {
         const vol = (ex.sets || 0) * (ex.reps || 0) * (ex.weight || 0);
         html += `
           <div class="data-item">
-            <div class="data-item-icon" style="background:rgba(168,85,247,0.1)">${muscleEmojis[ex.muscle] || '⭐'}</div>
+            <div class="data-item-icon" style="background:rgba(255,255,255,0.05)">${muscleEmojis[ex.muscle] || '⭐'}</div>
             <div class="data-item-info">
               <div class="data-item-name">${ex.exercise}</div>
               <div class="data-item-meta">
                 <span class="muscle-tag ${ex.muscle}">${ex.muscle}</span>
                 &nbsp; ${ex.sets}×${ex.reps} ${ex.weight ? '@ ' + ex.weight + unit : ''}
+                ${ex.notes ? `<div style="margin-top:4px; font-style:italic; color:var(--text-muted)">"${ex.notes}"</div>` : ''}
               </div>
             </div>
             ${vol > 0 ? `<div class="data-item-value">${vol.toLocaleString()} ${unit}</div>` : ''}
@@ -64,6 +65,7 @@ const Workouts = (() => {
       sets: parseInt(document.getElementById('workout-sets').value) || 0,
       reps: parseInt(document.getElementById('workout-reps').value) || 0,
       weight: parseFloat(document.getElementById('workout-weight').value) || 0,
+      notes: document.getElementById('workout-notes').value.trim(),
     });
 
     document.getElementById('form-workout').reset();

@@ -89,24 +89,33 @@ const Nutrition = (() => {
     }
 
     let html = '<div class="data-list">';
-    foods.forEach(f => {
-      html += `
-        <div class="data-item">
-          <div class="data-item-icon" style="background:rgba(236,72,153,0.1)">🍗</div>
-          <div class="data-item-info">
-            <div class="data-item-name">${f.name}</div>
-            <div class="data-item-meta">
-              P: ${f.protein || 0}g &nbsp; C: ${f.carbs || 0}g &nbsp; F: ${f.fat || 0}g
+    const meals = ['Breakfast', 'Lunch', 'Dinner', 'Snack'];
+
+    meals.forEach(meal => {
+      const mealFoods = foods.filter(f => (f.meal || 'Snack') === meal);
+      if (mealFoods.length === 0) return;
+
+      html += `<div class="date-group-header" style="margin-top:var(--sp-md);">${meal}</div>`;
+
+      mealFoods.forEach(f => {
+        html += `
+          <div class="data-item">
+            <div class="data-item-icon" style="background:rgba(255,255,255,0.05)">🍗</div>
+            <div class="data-item-info">
+              <div class="data-item-name">${f.name}</div>
+              <div class="data-item-meta">
+                P: ${f.protein || 0}g &nbsp; C: ${f.carbs || 0}g &nbsp; F: ${f.fat || 0}g
+              </div>
+            </div>
+            <div class="data-item-value">${(f.calories || 0).toLocaleString()} kcal</div>
+            <div class="data-item-actions">
+              <button class="btn-icon" onclick="Nutrition.remove('${f.id}')" title="Delete">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2"/></svg>
+              </button>
             </div>
           </div>
-          <div class="data-item-value">${(f.calories || 0).toLocaleString()} kcal</div>
-          <div class="data-item-actions">
-            <button class="btn-icon" onclick="Nutrition.remove('${f.id}')" title="Delete">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2"/></svg>
-            </button>
-          </div>
-        </div>
-      `;
+        `;
+      });
     });
     html += '</div>';
     listEl.innerHTML = html;
@@ -119,6 +128,7 @@ const Nutrition = (() => {
 
     Storage.addFood({
       name,
+      meal: document.getElementById('food-meal') ? document.getElementById('food-meal').value : 'Snack',
       calories: parseFloat(document.getElementById('food-calories').value) || 0,
       protein: parseFloat(document.getElementById('food-protein').value) || 0,
       carbs: parseFloat(document.getElementById('food-carbs').value) || 0,
