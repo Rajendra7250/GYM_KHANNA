@@ -208,5 +208,14 @@ const Charts = (() => {
     }
   }
 
-  return { drawBarChart, drawLineChart, drawDonutChart };
+  function drawEmptyState(canvas, msg) {
+    const { ctx, w, h } = setupCanvas(canvas);
+    ctx.clearRect(0, 0, w, h);
+    ctx.fillStyle = COLORS.text;
+    ctx.font = '13px Inter, sans-serif';
+    ctx.textAlign = 'center';
+    ctx.fillText(msg, w / 2, h / 2);
+  }
+
+  return { drawBarChart, drawLineChart, drawDonutChart, drawEmptyState };
 })();

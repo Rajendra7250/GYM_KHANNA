@@ -105,9 +105,15 @@
 
     <!-- ============ WORKOUTS PAGE ============ -->
     <section class="page" id="page-workouts">
-      <div class="page-header">
-        <h2>Workouts</h2>
-        <p>Track every set, rep, and PR</p>
+      <div class="page-header" style="display:flex; justify-content:space-between; align-items:flex-start;">
+        <div>
+          <h2>Workouts</h2>
+          <p>Track every set, rep, and PR</p>
+        </div>
+        <div id="session-timer-container" style="text-align:right;">
+          <div id="session-clock" style="font-family:monospace; font-size:1.2rem; color:var(--primary); font-weight:bold; display:none; margin-bottom:4px;">00:00:00</div>
+          <button class="btn btn-primary" id="btn-session-toggle">Start Workout</button>
+        </div>
       </div>
       <div class="section-title">
         <h3>Templates & Routines</h3>
@@ -149,6 +155,20 @@
         <div class="section-title"><h3>Macros</h3></div>
         <div class="macro-bars" id="macro-bars"></div>
       </div>
+
+      <div class="card" style="margin-bottom: var(--sp-lg); text-align: center;">
+        <div class="section-title"><h3>Water Intake</h3></div>
+        <div class="water-gauge-container">
+          <div class="water-gauge">
+            <div class="water-fill" id="water-fill"></div>
+            <div class="water-text"><span id="water-current">0</span> / <span id="water-target">3000</span> ml</div>
+          </div>
+        </div>
+        <div style="display:flex; justify-content:center; gap:var(--sp-md); margin-top:var(--sp-md);">
+          <button class="btn btn-ghost" onclick="Nutrition.addWater(250)">+ 250ml</button>
+          <button class="btn btn-ghost" onclick="Nutrition.addWater(500)">+ 500ml</button>
+        </div>
+      </div>
       <div class="section-title">
         <h3>Food Log</h3>
         <button class="btn btn-primary" id="btn-add-food">
@@ -167,15 +187,52 @@
       </div>
       <div class="stat-cards" id="progress-stats"></div>
       <div class="card" style="margin-bottom: var(--sp-xl);">
-        <div class="section-title"><h3>Body Weight</h3></div>
-        <div class="weight-input-row">
-          <div class="form-group">
-            <label class="form-label">Weight (kg)</label>
-            <input type="number" class="form-input" id="weight-input" placeholder="e.g. 75" step="0.1">
-          </div>
-          <button class="btn btn-primary" id="btn-log-weight">Log</button>
+        <div class="section-title">
+          <h3>Body Metrics</h3>
+          <select class="form-select" id="metric-selector" style="width:auto; margin:0;">
+            <option value="weight">Weight</option>
+            <option value="bodyFat">Body Fat %</option>
+            <option value="chest">Chest</option>
+            <option value="waist">Waist</option>
+            <option value="biceps">Biceps</option>
+            <option value="thighs">Thighs</option>
+          </select>
         </div>
-        <div class="chart-container"><canvas id="chart-weight" height="200"></canvas></div>
+        <div class="chart-container"><canvas id="chart-progress" height="200"></canvas></div>
+        
+        <div style="margin-top: var(--sp-lg); border-top: 1px solid rgba(255,255,255,0.05); padding-top: var(--sp-lg);">
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Weight (kg)</label>
+              <input type="number" class="form-input" id="measure-weight" placeholder="75" step="0.1">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Body Fat %</label>
+              <input type="number" class="form-input" id="measure-bodyFat" placeholder="15" step="0.1">
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Chest (cm)</label>
+              <input type="number" class="form-input" id="measure-chest" placeholder="100">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Waist (cm)</label>
+              <input type="number" class="form-input" id="measure-waist" placeholder="80">
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Biceps (cm)</label>
+              <input type="number" class="form-input" id="measure-biceps" placeholder="35">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Thighs (cm)</label>
+              <input type="number" class="form-input" id="measure-thighs" placeholder="55">
+            </div>
+          </div>
+          <button class="btn btn-primary" id="btn-log-measurements" style="width:100%; margin-top:var(--sp-sm);">Update Measurements</button>
+        </div>
       </div>
       <div class="section-title"><h3>Personal Records 🏆</h3></div>
       <div class="pr-grid" id="pr-grid"></div>
@@ -389,6 +446,22 @@
       </div>
       <button type="submit" class="btn btn-primary btn-lg" style="width:100%; margin-top:var(--sp-sm);">Save Routine</button>
     </form>
+  </div>
+</div>
+
+<!-- Exercise History Modal -->
+<div class="modal-overlay" id="modal-history">
+  <div class="modal" style="max-width: 600px;">
+    <div class="modal-header">
+      <h3 id="history-title">Exercise History</h3>
+      <button class="modal-close" data-close="modal-history">✕</button>
+    </div>
+    <div class="chart-container" style="margin-bottom: var(--sp-lg);">
+      <canvas id="chart-history" height="200"></canvas>
+    </div>
+    <div id="history-list" class="data-list" style="max-height: 300px; overflow-y: auto;">
+      <!-- History items injected here -->
+    </div>
   </div>
 </div>
 

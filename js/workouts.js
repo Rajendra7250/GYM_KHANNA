@@ -35,7 +35,7 @@ const Workouts = (() => {
           <div class="data-item ${ex.supersetId ? 'superset-item' : ''}">
             <div class="data-item-icon" style="background:rgba(255,255,255,0.05)">${muscleEmojis[ex.muscle] || '⭐'}</div>
             <div class="data-item-info">
-              <div class="data-item-name">${ex.exercise}</div>
+              <div class="data-item-name clickable" onclick="Workouts.showHistory('${ex.exercise}')">${ex.exercise}</div>
               <div class="data-item-meta">
                 <span class="muscle-tag ${ex.muscle}">${ex.muscle}</span>
                 &nbsp; ${ex.sets}×${ex.reps} ${ex.weight ? '@ ' + ex.weight + unit : ''}
@@ -245,6 +245,43 @@ const Workouts = (() => {
     });
   }
 
+  function showHistory(name) {
+    const workouts = Storage.getWorkouts().filter(w => w.exercise === name);
+    document.getElementById('history-title').textContent = `${name} History`;
+    
+    const list = document.getElementById('history-list');
+    if (workouts.length === 0) {
+      list.innerHTML = `<div class="empty-state">No history for this exercise.</div>`;
+    } else {
+      let html = '';
+      workouts.forEach(w => {
+        html += `
+          <div class="data-item">
+            <div class="data-item-info">
+              <div class="data-item-name">${Storage.formatDate(w.date)}</div>
+              <div class="data-item-meta">${w.sets}×${w.reps} @ ${w.weight || 0} ${Settings.getSettings().unit}</div>
+            </div>
+            <div class="data-item-value">${((w.sets || 0) * (w.reps || 0) * (w.weight || 0)).toLocaleString()}</div>
+          </div>
+        `;
+      });
+      list.innerHTML = html;
+    }
+
+    const canvas = document.getElementById('chart-history');
+    if (workouts.length > 0) {
+      const chartData = workouts.slice().reverse().map(w => ({
+        label: Storage.formatDate(w.date),
+        value: w.weight || 0
+      }));
+      Charts.drawLineChart(canvas, chartData);
+    } else {
+      Charts.drawEmptyState(canvas, 'No progression data');
+    }
+
+    App.openModal('modal-history');
+  }
+
   function init() {
     ExerciseLibrary.populateSelect('workout-exercise');
     document.getElementById('form-workout').addEventListener('submit', handleSubmit);
@@ -253,8 +290,10 @@ const Workouts = (() => {
     const btnAddRoutine = document.getElementById('btn-add-routine');
     if (btnAddRoutine) btnAddRoutine.addEventListener('click', () => App.openModal('modal-routine'));
     
+    if (typeof Timer !== 'undefined') Timer.updateSessionUI();
+    
     initPresetSync();
   }
 
-  return { render, renderTemplates, init, remove, edit, logRoutine, deleteRoutine };
+  return { render, renderTemplates, init, remove, edit, logRoutine, deleteRoutine, showHistory };
 })();

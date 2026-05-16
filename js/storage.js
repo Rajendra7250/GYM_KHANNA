@@ -5,6 +5,8 @@ const Storage = (() => {
     food: 'gk_food',
     weight: 'gk_weight',
     templates: 'gk_templates',
+    water: 'gk_water',
+    sessions: 'gk_sessions',
   };
 
   function _get(key) {
@@ -128,20 +130,66 @@ const Storage = (() => {
     };
   }
 
-  // ===== WEIGHT =====
+  // ===== WEIGHT / MEASUREMENTS =====
   function getWeightLog() { return _get(KEYS.weight); }
-  function addWeight(kg) {
+  function addMeasurement(data) {
     const all = getWeightLog();
     const today = todayStr();
     const idx = all.findIndex(w => w.date === today);
-    if (idx >= 0) { all[idx].kg = kg; }
-    else { all.push({ date: today, kg, timestamp: Date.now() }); }
+    const entry = { ...data, date: today, timestamp: Date.now() };
+    if (entry.weight !== undefined) entry.kg = entry.weight;
+    
+    if (idx >= 0) {
+      all[idx] = { ...all[idx], ...entry };
+    } else {
+      all.push(entry);
+    }
     all.sort((a, b) => a.date.localeCompare(b.date));
     _set(KEYS.weight, all);
   }
   function getLatestWeight() {
     const all = getWeightLog();
-    return all.length ? all[all.length - 1].kg : null;
+    if (!all.length) return null;
+    const latest = all[all.length - 1];
+    return latest.weight || latest.kg || null;
+  }
+  function getLatestMeasurement() {
+    const all = getWeightLog();
+    return all.length ? all[all.length - 1] : null;
+  }
+
+  // ===== WATER TRACKER =====
+  function getWaterLog() { return _get(KEYS.water); }
+  function addWater(amount, ds) {
+    const all = getWaterLog();
+    const date = ds || todayStr();
+    const idx = all.findIndex(w => w.date === date);
+    if (idx >= 0) {
+      all[idx].amount = (all[idx].amount || 0) + amount;
+    } else {
+      all.push({ date, amount, timestamp: Date.now() });
+    }
+    _set(KEYS.water, all);
+  }
+  function getWaterByDate(ds) {
+    const all = getWaterLog();
+    const entry = all.find(w => w.date === (ds || todayStr()));
+    return entry ? entry.amount : 0;
+  }
+
+  // ===== WORKOUT SESSIONS =====
+  function getSessions() { return _get(KEYS.sessions); }
+  function addSession(session) {
+    const all = getSessions();
+    session.id = Date.now().toString(36);
+    session.timestamp = Date.now();
+    all.push(session);
+    _set(KEYS.sessions, all);
+    return session;
+  }
+  function getLatestSession() {
+    const all = getSessions();
+    return all.length ? all[all.length - 1] : null;
   }
 
   // ===== STATS =====
@@ -186,5 +234,8 @@ const Storage = (() => {
     getFood, addFood, deleteFood, getFoodByDate, getDailyNutrition,
     getWeightLog, addWeight, getLatestWeight,
     getStreak, getPersonalRecords, getTotalVolume, getTotalWorkouts,
+    addMeasurement, getLatestMeasurement,
+    getWaterLog, addWater, getWaterByDate,
+    getSessions, addSession, getLatestSession,
   };
 })();

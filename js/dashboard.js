@@ -52,6 +52,16 @@ const Dashboard = (() => {
         </div>
         <div class="stat-card-label">Day Streak</div>
       </div>
+      <div class="stat-card purple" style="background: linear-gradient(135deg, #2196F3, #64B5F6);">
+        <div class="stat-card-icon">💧</div>
+        <div class="stat-card-value">${Storage.getWaterByDate()} ml</div>
+        <div class="stat-card-label">Water Today</div>
+      </div>
+      <div class="stat-card cyan" style="background: linear-gradient(135deg, #4CAF50, #81C784);">
+        <div class="stat-card-icon">⏱️</div>
+        <div class="stat-card-value">${Storage.getLatestSession() ? Storage.getLatestSession().duration + 'm' : '—'}</div>
+        <div class="stat-card-label">Last Workout</div>
+      </div>
     `;
     document.getElementById('dashboard-stats').innerHTML = statsHTML;
 

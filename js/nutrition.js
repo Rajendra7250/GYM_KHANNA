@@ -18,6 +18,7 @@ const Nutrition = (() => {
 
   function render() {
     updateDateLabel();
+    renderWater();
     const ds = getDateStr();
     const nutrition = Storage.getDailyNutrition(ds);
     const foods = Storage.getFoodByDate(ds);
@@ -181,6 +182,30 @@ const Nutrition = (() => {
     App.openModal('modal-food');
   }
 
+  function renderWater() {
+    const ds = getDateStr();
+    const amount = Storage.getWaterByDate(ds);
+    const target = 3000; // default 3L
+    const fill = Math.min((amount / target) * 100, 100);
+    
+    const fillEl = document.getElementById('water-fill');
+    const currentEl = document.getElementById('water-current');
+    const targetEl = document.getElementById('water-target');
+    
+    if (fillEl) fillEl.style.height = `${fill}%`;
+    if (currentEl) currentEl.textContent = amount;
+    if (targetEl) targetEl.textContent = target;
+  }
+
+  function addWater(amount) {
+    const ds = getDateStr();
+    Storage.addWater(amount, ds);
+    renderWater();
+    if (Storage.isToday(ds)) {
+      Dashboard.render();
+    }
+  }
+
   function initPresetSync() {
     const preset = document.getElementById('food-preset');
     if (!preset) return;
@@ -222,5 +247,5 @@ const Nutrition = (() => {
     initPresetSync();
   }
 
-  return { render, init, remove, edit };
+  return { render, init, remove, edit, addWater };
 })();

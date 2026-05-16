@@ -1,8 +1,8 @@
 /* ===== Progress Page ===== */
 const Progress = (() => {
+  let activeMetric = 'weight';
 
   function render() {
-    // Stats
     const totalWorkouts = Storage.getTotalWorkouts();
     const totalVolume = Storage.getTotalVolume();
     const streak = Storage.getStreak();
@@ -35,39 +35,42 @@ const Progress = (() => {
       `;
     }
 
-    // Weight chart
-    renderWeightChart();
-
-    // Personal records
+    renderProgressChart();
     renderPRs();
+    prefillInputs();
   }
 
-  function renderWeightChart() {
-    const weightLog = Storage.getWeightLog();
-    const canvas = document.getElementById('chart-weight');
+  function prefillInputs() {
+    const latest = Storage.getLatestMeasurement();
+    if (!latest) return;
+    const fields = ['weight', 'bodyFat', 'chest', 'waist', 'biceps', 'thighs'];
+    fields.forEach(f => {
+      const input = document.getElementById(`measure-${f}`);
+      if (input && latest[f]) input.value = latest[f];
+    });
+  }
+
+  function renderProgressChart() {
+    const log = Storage.getWeightLog();
+    const canvas = document.getElementById('chart-progress');
     if (!canvas) return;
 
-    if (!weightLog.length) {
-      const ctx = canvas.getContext('2d');
-      const dpr = window.devicePixelRatio || 1;
-      const rect = canvas.parentElement.getBoundingClientRect();
-      canvas.width = rect.width * dpr;
-      canvas.height = 200 * dpr;
-      ctx.scale(dpr, dpr);
-      canvas.style.width = rect.width + 'px';
-      canvas.style.height = '200px';
-      ctx.clearRect(0, 0, rect.width, 200);
-      ctx.fillStyle = '#8a8a9a';
-      ctx.font = '13px Inter, sans-serif';
-      ctx.textAlign = 'center';
-      ctx.fillText('Log your weight to see the trend chart', rect.width / 2, 100);
+    if (!log.length) {
+      Charts.drawEmptyState(canvas, 'Log your metrics to see trend charts');
       return;
     }
 
-    const data = weightLog.map(w => ({
-      label: Storage.formatDate(w.date),
-      value: w.kg,
-    }));
+    const data = log.filter(entry => entry[activeMetric] !== undefined || (activeMetric === 'weight' && entry.kg !== undefined))
+      .map(entry => ({
+        label: Storage.formatDate(entry.date),
+        value: entry[activeMetric] || entry.kg,
+      }));
+
+    if (!data.length) {
+      Charts.drawEmptyState(canvas, `No data for ${activeMetric} yet`);
+      return;
+    }
+
     Charts.drawLineChart(canvas, data);
   }
 
@@ -100,32 +103,41 @@ const Progress = (() => {
     grid.innerHTML = html;
   }
 
-  function handleLogWeight() {
-    const input = document.getElementById('weight-input');
-    const val = parseFloat(input.value);
-    if (!val || val <= 0) {
-      App.toast('Please enter a valid weight');
+  function handleLogMeasurements() {
+    const data = {
+      weight: parseFloat(document.getElementById('measure-weight').value),
+      bodyFat: parseFloat(document.getElementById('measure-bodyFat').value),
+      chest: parseFloat(document.getElementById('measure-chest').value),
+      waist: parseFloat(document.getElementById('measure-waist').value),
+      biceps: parseFloat(document.getElementById('measure-biceps').value),
+      thighs: parseFloat(document.getElementById('measure-thighs').value),
+    };
+
+    // Remove undefined/NaN values
+    Object.keys(data).forEach(key => {
+      if (isNaN(data[key])) delete data[key];
+    });
+
+    if (Object.keys(data).length === 0) {
+      App.toast('Please enter at least one measurement');
       return;
     }
-    Storage.addWeight(val);
-    input.value = '';
-    App.toast('Weight logged! ⚖️', 'success');
+
+    Storage.addMeasurement(data);
+    App.toast('Measurements updated! 📊', 'success');
     render();
     Dashboard.render();
   }
 
   function init() {
-    const btn = document.getElementById('btn-log-weight');
-    if (btn) btn.addEventListener('click', handleLogWeight);
+    const btn = document.getElementById('btn-log-measurements');
+    if (btn) btn.addEventListener('click', handleLogMeasurements);
 
-    // Enter key on weight input
-    const input = document.getElementById('weight-input');
-    if (input) {
-      input.addEventListener('keydown', (e) => {
-        if (e.key === 'Enter') {
-          e.preventDefault();
-          handleLogWeight();
-        }
+    const selector = document.getElementById('metric-selector');
+    if (selector) {
+      selector.addEventListener('change', (e) => {
+        activeMetric = e.target.value;
+        renderProgressChart();
       });
     }
   }
