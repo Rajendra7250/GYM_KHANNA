@@ -262,29 +262,12 @@
         <div class="section-title"><h3>Progress Photos 📸</h3></div>
         <div style="display:flex; gap:var(--sp-md); margin-bottom:var(--sp-md);">
           <label class="btn btn-primary" style="flex:1; text-align:center; cursor:pointer;">
-            Upload / Take Photo
+            Take Today's Photo
             <input type="file" id="photo-upload" accept="image/*" capture="environment" style="display:none;">
           </label>
+          <button class="btn btn-ghost" id="btn-compare-photos" style="flex:1; display:none;">Compare Photos</button>
         </div>
-        <div id="photo-comparison-container" style="display:none;">
-          <div style="display:flex; gap:var(--sp-sm); margin-bottom:var(--sp-sm);">
-            <div style="flex:1;">
-              <label class="form-label">Before</label>
-              <select class="form-select" id="photo-select-before"></select>
-            </div>
-            <div style="flex:1;">
-              <label class="form-label">After</label>
-              <select class="form-select" id="photo-select-after"></select>
-            </div>
-          </div>
-          <div style="position:relative; width:100%; aspect-ratio:3/4; background:var(--bg-tertiary); border-radius:var(--r-md); overflow:hidden;" id="photo-slider-area">
-            <img id="photo-img-before" style="position:absolute; top:0; left:0; width:100%; height:100%; object-fit:cover;">
-            <div id="photo-clip-after" style="position:absolute; top:0; left:0; width:50%; height:100%; overflow:hidden; border-right:2px solid var(--primary);">
-              <img id="photo-img-after" style="position:absolute; top:0; left:0; height:100%; object-fit:cover;">
-            </div>
-            <input type="range" min="0" max="100" value="50" id="photo-slider-input" style="position:absolute; top:0; left:0; width:100%; height:100%; opacity:0; cursor:ew-resize;">
-          </div>
-        </div>
+        <div id="photo-gallery" style="display:grid; grid-template-columns:repeat(auto-fit, minmax(120px, 1fr)); gap:var(--sp-md); display:none;"></div>
         <div id="photo-empty" class="empty-state">
           <div class="empty-state-icon">📷</div>
           <div class="empty-state-text">Take your first progress photo to start tracking!</div>
@@ -614,6 +597,41 @@
       </button>
     </form>
   </div>
+</div>
+
+<!-- Compare Photos Modal -->
+<div class="modal-overlay" id="modal-compare">
+  <div class="modal" style="max-width:800px;">
+    <div class="modal-header">
+      <h3>Compare Photos</h3>
+      <button class="modal-close" data-close="modal-compare">✕</button>
+    </div>
+    <div style="display:flex; flex-wrap:wrap; gap:var(--sp-md); margin-bottom:var(--sp-md);">
+      <div style="flex:1; min-width:200px;">
+        <label class="form-label">Before</label>
+        <select class="form-select" id="photo-select-before"></select>
+        <img id="photo-img-before" style="width:100%; aspect-ratio:3/4; object-fit:cover; border-radius:var(--r-md); margin-top:var(--sp-sm); background:var(--bg-tertiary);">
+      </div>
+      <div style="flex:1; min-width:200px;">
+        <label class="form-label">After</label>
+        <select class="form-select" id="photo-select-after"></select>
+        <img id="photo-img-after" style="width:100%; aspect-ratio:3/4; object-fit:cover; border-radius:var(--r-md); margin-top:var(--sp-sm); background:var(--bg-tertiary);">
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Hidden Share Template -->
+<div id="share-pr-template">
+  <div style="font-size:4rem; margin-bottom:20px;">🔥🎉💪</div>
+  <h1>NEW PERSONAL RECORD</h1>
+  <div class="share-weight" id="share-template-weight">100 kg</div>
+  <div class="share-reps" id="share-template-exercise">Bench Press × 5 reps</div>
+  <div class="share-footer">
+    <div style="width:40px; height:40px; background:white; color:#FF6B6B; border-radius:50%; display:flex; align-items:center; justify-content:center; font-weight:900;">G</div>
+    GymKhanna
+  </div>
+  <div class="share-badge">CRUSHED IT!</div>
 </div>
 
 <!-- Toast Container -->

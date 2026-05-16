@@ -58,8 +58,18 @@ const Nutrition = (() => {
     if (!html5QrcodeScanner) {
       html5QrcodeScanner = new Html5QrcodeScanner(
         "barcode-scanner-container", 
-        { fps: 10, qrbox: { width: 250, height: 150 } },
-        false
+        { 
+          fps: 10, 
+          qrbox: { width: 300, height: 150 },
+          formatsToSupport: [
+            Html5QrcodeSupportedFormats.EAN_13,
+            Html5QrcodeSupportedFormats.UPC_A,
+            Html5QrcodeSupportedFormats.EAN_8,
+            Html5QrcodeSupportedFormats.UPC_E
+          ],
+          showTorchButtonIfSupported: true
+        },
+        false // verbose = false
       );
     }
     
@@ -67,7 +77,8 @@ const Nutrition = (() => {
       fetchProductByBarcode(decodedText);
       stopScanner();
     }, (error) => {
-      // ignore
+      // The library logs a lot of "No MultiFormat Readers" warnings frame-by-frame.
+      // We intentionally ignore them here to keep the console clean.
     });
   }
 

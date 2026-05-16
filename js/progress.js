@@ -180,45 +180,56 @@ const Progress = (() => {
   // ===== PROGRESS PHOTOS =====
   function renderPhotos() {
     const photos = Storage.getPhotos();
-    const container = document.getElementById('photo-comparison-container');
+    const gallery = document.getElementById('photo-gallery');
     const emptyState = document.getElementById('photo-empty');
-    if (!container || !emptyState) return;
+    const compareBtn = document.getElementById('btn-compare-photos');
+    if (!gallery || !emptyState) return;
 
     if (photos.length === 0) {
-      container.style.display = 'none';
+      gallery.style.display = 'none';
       emptyState.style.display = 'flex';
+      if (compareBtn) compareBtn.style.display = 'none';
       return;
     }
 
-    container.style.display = 'block';
+    gallery.style.display = 'grid';
     emptyState.style.display = 'none';
+    if (compareBtn) compareBtn.style.display = photos.length > 1 ? 'block' : 'none';
 
-    // Populate selects
-    const selBefore = document.getElementById('photo-select-before');
-    const selAfter = document.getElementById('photo-select-after');
-    
     let html = '';
     photos.forEach(p => {
-      html += `<option value="${p.id}">${Storage.formatDate(p.date)}</option>`;
+      html += `
+        <div style="position:relative; aspect-ratio:3/4; border-radius:var(--r-md); overflow:hidden; background:var(--bg-tertiary);">
+          <img src="${p.data}" style="width:100%; height:100%; object-fit:cover;">
+          <div style="position:absolute; bottom:0; left:0; right:0; background:rgba(0,0,0,0.6); backdrop-filter:blur(4px); padding:4px 8px; font-size:0.75rem; text-align:center;">
+            ${Storage.formatDate(p.date)}
+          </div>
+        </div>
+      `;
     });
-    
-    // Remember previous selection or default
-    const prevB = selBefore.value;
-    const prevA = selAfter.value;
-    
-    selBefore.innerHTML = html;
-    selAfter.innerHTML = html;
+    gallery.innerHTML = html;
 
-    if (photos.length > 1) {
-      // Default: oldest for before, newest for after
-      selBefore.value = prevB || photos[photos.length - 1].id;
-      selAfter.value = prevA || photos[0].id;
+    // Populate compare selects
+    const selBefore = document.getElementById('photo-select-before');
+    const selAfter = document.getElementById('photo-select-after');
+    if (selBefore && selAfter) {
+      let optHtml = '';
+      photos.forEach(p => { optHtml += `<option value="${p.id}">${Storage.formatDate(p.date)}</option>`; });
+      
+      const prevB = selBefore.value;
+      const prevA = selAfter.value;
+      selBefore.innerHTML = optHtml;
+      selAfter.innerHTML = optHtml;
+      
+      if (photos.length > 1) {
+        selBefore.value = prevB || photos[photos.length - 1].id;
+        selAfter.value = prevA || photos[0].id;
+      }
+      updatePhotoComparison();
     }
-
-    updatePhotoSlider();
   }
 
-  function updatePhotoSlider() {
+  function updatePhotoComparison() {
     const photos = Storage.getPhotos();
     const idB = document.getElementById('photo-select-before').value;
     const idA = document.getElementById('photo-select-after').value;
@@ -276,23 +287,34 @@ const Progress = (() => {
       return;
     }
     
-    const element = document.getElementById(cardId);
-    // Hide the share button briefly for the screenshot
-    const btn = element.querySelector('button');
-    btn.style.display = 'none';
+    // Get actual PR data
+    const prs = Storage.getPersonalRecords();
+    const pr = prs.find(p => p.exercise === exerciseName);
+    if (!pr) return;
+    
+    const unit = Settings.getSettings().unit;
+    
+    // Populate the template
+    document.getElementById('share-template-weight').textContent = `${pr.weight} ${unit}`;
+    document.getElementById('share-template-exercise').textContent = `${pr.exercise} × ${pr.reps} reps`;
+    
+    const template = document.getElementById('share-pr-template');
     
     try {
-      const canvas = await html2canvas(element, { backgroundColor: '#1e1e24' });
-      btn.style.display = 'block'; // Restore button
+      App.toast('Generating cute PR card...', 'success');
+      const canvas = await html2canvas(template, { 
+        backgroundColor: null,
+        scale: 2 // High quality
+      });
       
       canvas.toBlob(async (blob) => {
-        const file = new File([blob], `pr-${exerciseName.replace(/ /g, '-')}.png`, { type: 'image/png' });
+        const file = new File([blob], `gymkhanna-pr-${exerciseName.replace(/ /g, '-')}.png`, { type: 'image/png' });
         
         if (navigator.canShare && navigator.canShare({ files: [file] })) {
           try {
             await navigator.share({
               title: `New PR for ${exerciseName}!`,
-              text: `Just hit a new PR for ${exerciseName} on GymKhanna! 💪`,
+              text: `Just hit a new PR for ${exerciseName} on GymKhanna! 🔥💪`,
               files: [file]
             });
           } catch (err) {
@@ -310,7 +332,6 @@ const Progress = (() => {
         }
       });
     } catch (err) {
-      btn.style.display = 'block';
       App.toast('Failed to generate image', 'error');
       console.error(err);
     }
@@ -349,18 +370,13 @@ const Progress = (() => {
     const photoUpload = document.getElementById('photo-upload');
     if (photoUpload) photoUpload.addEventListener('change', handlePhotoUpload);
 
+    const btnCompare = document.getElementById('btn-compare-photos');
+    if (btnCompare) btnCompare.addEventListener('click', () => App.openModal('modal-compare'));
+
     const selBefore = document.getElementById('photo-select-before');
     const selAfter = document.getElementById('photo-select-after');
-    if (selBefore) selBefore.addEventListener('change', updatePhotoSlider);
-    if (selAfter) selAfter.addEventListener('change', updatePhotoSlider);
-
-    const slider = document.getElementById('photo-slider-input');
-    const clipAfter = document.getElementById('photo-clip-after');
-    if (slider && clipAfter) {
-      slider.addEventListener('input', (e) => {
-        clipAfter.style.width = e.target.value + '%';
-      });
-    }
+    if (selBefore) selBefore.addEventListener('change', updatePhotoComparison);
+    if (selAfter) selAfter.addEventListener('change', updatePhotoComparison);
   }
 
   return { render, init, sharePR };
