@@ -3,8 +3,11 @@ const AI = (() => {
   const GEMINI_URL = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent';
 
   function getApiKey() {
+    if (window.ENV && window.ENV.GEMINI_API_KEY) {
+      return window.ENV.GEMINI_API_KEY;
+    }
     const s = Settings.getSettings();
-    return s.geminiApiKey || ("AIzaSy" + "CYSXw4WuMENVKjlRRmt0DL_ajOVfpad3Y");
+    return s.geminiApiKey || "";
   }
 
   async function callGemini(prompt) {
